@@ -1,0 +1,253 @@
+{
+  "Lingkup": "MASYARAKAT",
+  "Total_Indikator": 15,
+  "Total_Variabel": 5,
+  "Total_Bobot": 1.0,
+  "Variabel": [
+    {
+      "Kode_Variabel": "M1",
+      "Variabel": "Program & Perencanaan Literasi",
+      "Bobot_Variabel": 0.25,
+      "Indikator": [
+        {
+          "Kode": "M1.1",
+          "Indikator": "Identifikasi Kebutuhan & Perencanaan",
+          "Deskripsi": "Terdapat proses identifikasi kebutuhan literasi masyarakat secara partisipatif dan penyusunan rencana program yang terstruktur",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada proses identifikasi kebutuhan",
+            "2": "Ada tapi hanya berdasarkan asumsi pengelola",
+            "3": "Ada dengan melibatkan sebagian masyarakat",
+            "4": "Ada dengan metode partisipatif dan dokumen perencanaan lengkap"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Periksa apakah pernah dilakukan survei, FGD, atau musyawarah untuk menggali kebutuhan literasi masyarakat (apa yang dibutuhkan anak, remaja, dewasa, lansia). Cek keberadaan dokumen perencanaan program literasi masyarakat: visi-misi, tujuan, target kelompok, jadwal kegiatan. Nilai tingkat partisipasi masyarakat dalam penyusunan program (apakah top-down atau melibatkan warga)."
+        },
+        {
+          "Kode": "M1.2",
+          "Indikator": "Komprehensivitas Program",
+          "Deskripsi": "Program literasi mencakup berbagai dimensi (baca-tulis, numerasi, sains, digital, finansial, budaya) dan menyasar berbagai kalangan (anak, remaja, dewasa)",
+          "Tipe_Skala": "Tipe 3: Cakupan + Kualitas",
+          "Skala_Scoring": {
+            "1": "Hanya 1-2 dimensi dan 1 kelompok sasaran",
+            "2": "3 dimensi literasi, 2 kelompok sasaran",
+            "3": "4-5 dimensi literasi, 3 kelompok sasaran",
+            "4": "6 dimensi literasi lengkap, menyasar semua kalangan"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Inventarisasi jenis program literasi yang ada di masyarakat dan dimensi apa saja yang tercakup: baca-tulis (TBM, kelas baca), numerasi (kelas hitung praktis), sains (pelatihan pertanian modern, kesehatan), digital (kelas komputer/smartphone), finansial (edukasi tabungan, koperasi), budaya-kewargaan (belajar sejarah lokal, gotong royong). Identifikasi kelompok sasaran: apakah hanya anak-anak atau juga remaja, ibu-ibu, petani, pedagang, lansia."
+        },
+        {
+          "Kode": "M1.3",
+          "Indikator": "Evaluasi & Keberlanjutan Program",
+          "Deskripsi": "Terdapat mekanisme evaluasi berkala dan upaya menjaga keberlanjutan program literasi masyarakat",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada evaluasi dan program tidak berkelanjutan",
+            "2": "Ada evaluasi informal tapi program sering vakum",
+            "3": "Ada evaluasi berkala (1-2x per tahun) dan program cukup berkelanjutan",
+            "4": "Ada evaluasi rutin dengan tindak lanjut dan program sangat berkelanjutan"
+          },
+          "Bobot": 0.084,
+          "Observasi": "Tanyakan apakah program literasi masyarakat dievaluasi secara berkala: ada rapat evaluasi, pencatatan jumlah peserta/pengunjung, survei kepuasan, atau penilaian dampak. Amati keberlanjutan program: apakah program berjalan konsisten sepanjang tahun atau hanya musiman (saat ada anggaran/kegiatan tertentu). Periksa dokumentasi laporan kegiatan dan rencana tindak lanjut berdasarkan hasil evaluasi."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "M2",
+      "Variabel": "Infrastruktur & Sumber Daya Literasi",
+      "Bobot_Variabel": 0.25,
+      "Indikator": [
+        {
+          "Kode": "M2.1",
+          "Indikator": "Pusat Literasi Masyarakat",
+          "Deskripsi": "Keberadaan dan kualitas pusat literasi (TBM/Perpustakaan Desa): lokasi strategis, bangunan layak, jam operasional memadai",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada TBM/Perpustakaan Desa",
+            "2": "Ada tapi kondisi buruk dan jarang buka",
+            "3": "Ada dengan kondisi baik dan buka teratur",
+            "4": "Ada dengan kondisi sangat baik, lokasi strategis, buka optimal"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Observasi langsung TBM atau perpustakaan desa: kondisi bangunan (layak/rusak), kebersihan, ventilasi, pencahayaan. Periksa lokasi: apakah mudah diakses warga atau terpencil. Tanyakan jam operasional: berapa hari per minggu buka, apakah sesuai waktu luang warga (sore/akhir pekan). Amati ketersediaan fasilitas dasar: rak buku, meja baca, toilet, tempat parkir."
+        },
+        {
+          "Kode": "M2.2",
+          "Indikator": "Koleksi Bahan Bacaan",
+          "Deskripsi": "Ketersediaan dan keragaman koleksi bahan bacaan untuk semua usia (anak, remaja, dewasa): buku, majalah, koran, multimedia",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Sangat minim (< 100 buku, tidak bervariasi)",
+            "2": "Terbatas (100-500 buku, 1-2 jenis)",
+            "3": "Cukup memadai (500-1000 buku, 3-4 jenis)",
+            "4": "Sangat memadai (1000+ buku, lengkap dan terawat)"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Hitung atau estimasi jumlah koleksi buku yang tersedia. Identifikasi jenis koleksi: buku fiksi anak/dewasa, nonfiksi (ensiklopedia, biografi, keterampilan), buku pelajaran, majalah, koran, atau media digital (e-book, video edukatif). Nilai keragaman konten: apakah ada untuk semua usia atau hanya anak-anak. Periksa kondisi fisik koleksi (banyak yang rusak/hilang atau terawat baik) dan frekuensi pembaruan (ada penambahan buku baru atau tidak)."
+        },
+        {
+          "Kode": "M2.3",
+          "Indikator": "Pengelolaan & Fasilitas Pendukung",
+          "Deskripsi": "Kualitas pengelolaan TBM/Perpustakaan (sistem katalog, peminjaman, petugas terlatih) dan fasilitas pendukung (WiFi, komputer, ruang diskusi)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada sistem pengelolaan dan fasilitas pendukung",
+            "2": "Ada pengelolaan sederhana tapi tidak ada fasilitas",
+            "3": "Ada pengelolaan baik dan beberapa fasilitas (1-2 jenis)",
+            "4": "Ada pengelolaan profesional dan fasilitas lengkap"
+          },
+          "Bobot": 0.084,
+          "Observasi": "Periksa sistem pengelolaan: apakah ada katalog buku (manual/digital), kartu anggota, sistem peminjaman yang jelas, dan petugas/relawan yang terlatih. Amati fasilitas pendukung: ketersediaan WiFi gratis, komputer untuk akses digital, ruang diskusi/belajar kelompok, area bermain anak. Nilai keterampilan petugas dalam melayani pengunjung dan mengorganisir kegiatan. Cek pencatatan data kunjungan dan peminjaman."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "M3",
+      "Variabel": "Kolaborasi Multi-Stakeholder",
+      "Bobot_Variabel": 0.2,
+      "Indikator": [
+        {
+          "Kode": "M3.1",
+          "Indikator": "Keterlibatan Pemangku Kepentingan",
+          "Deskripsi": "Keterlibatan aktif berbagai pihak (pemerintah desa, DUDI, perguruan tinggi, tokoh masyarakat, ormas) dalam mendukung program literasi",
+          "Tipe_Skala": "Tipe 3: Cakupan Kolaborasi",
+          "Skala_Scoring": {
+            "1": "Tidak ada pihak eksternal yang terlibat",
+            "2": "Ada 1-2 stakeholder terlibat sesekali",
+            "3": "Ada 3-4 stakeholder terlibat cukup rutin",
+            "4": "Ada 5+ stakeholder terlibat aktif dan terkoordinasi"
+          },
+          "Bobot": 0.067,
+          "Observasi": "Identifikasi pihak-pihak yang terlibat mendukung literasi masyarakat: pemerintah desa/kecamatan (kebijakan/anggaran), perusahaan/UMKM (CSR/donasi), perguruan tinggi (KKN/penelitian), tokoh masyarakat (mobilisasi warga), organisasi masyarakat/keagamaan (tempat/relawan). Nilai frekuensi dan bentuk keterlibatan: apakah hanya donasi sekali atau ada kemitraan berkelanjutan. Periksa mekanisme koordinasi antar stakeholder."
+        },
+        {
+          "Kode": "M3.2",
+          "Indikator": "Komunitas Literasi Aktif",
+          "Deskripsi": "Keberadaan dan keaktifan komunitas literasi masyarakat (relawan TBM, klub baca, forum penulis)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada komunitas literasi",
+            "2": "Ada tapi tidak aktif (vakum)",
+            "3": "Ada dan cukup aktif (1-2x per bulan)",
+            "4": "Ada dan sangat aktif (rutin mingguan, punya program)"
+          },
+          "Bobot": 0.067,
+          "Observasi": "Identifikasi komunitas literasi yang ada di masyarakat: kelompok relawan pengelola TBM, klub baca (book club), forum penulis lokal, atau komunitas storyteller. Nilai keaktifan: frekuensi pertemuan, jenis kegiatan (diskusi buku, bedah buku, lomba), jumlah anggota aktif. Periksa dokumentasi kegiatan komunitas (foto, laporan, publikasi). Amati apakah komunitas hanya internal atau juga terbuka untuk masyarakat umum."
+        },
+        {
+          "Kode": "M3.3",
+          "Indikator": "Dukungan Anggaran Pemerintah",
+          "Deskripsi": "Keberadaan dan konsistensi alokasi anggaran dari pemerintah desa/kecamatan untuk program literasi masyarakat",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada alokasi anggaran dari pemerintah",
+            "2": "Ada tapi tidak rutin (hanya pernah 1-2x)",
+            "3": "Ada dan cukup rutin (setiap tahun tapi minim)",
+            "4": "Ada rutin dengan alokasi memadai (ada pos khusus)"
+          },
+          "Bobot": 0.066,
+          "Observasi": "Periksa APBDes atau dokumen anggaran pemerintah setempat: apakah ada pos khusus untuk literasi masyarakat (TBM, pengadaan buku, pelatihan). Tanyakan besaran dan konsistensi anggaran: apakah setiap tahun ada atau hanya insidental. Nilai kecukupan anggaran untuk operasional dan pengembangan program. Cek transparansi penggunaan anggaran dan laporan pertanggungjawaban."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "M4",
+      "Variabel": "Penggiat & Kapasitas SDM",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "M4.1",
+          "Indikator": "Penggiat Literasi Aktif",
+          "Deskripsi": "Keberadaan dan keaktifan penggiat/relawan literasi yang konsisten menggerakkan kegiatan literasi di masyarakat",
+          "Tipe_Skala": "Tipe 3: Jumlah + Konsistensi",
+          "Skala_Scoring": {
+            "1": "Tidak ada penggiat literasi",
+            "2": "Ada 1-2 penggiat tapi tidak konsisten",
+            "3": "Ada 3-5 penggiat yang cukup konsisten",
+            "4": "Ada 6+ penggiat yang sangat konsisten dan terorganisir"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi siapa saja penggiat literasi di masyarakat: relawan TBM, guru yang aktif di luar jam sekolah, tokoh masyarakat, pemuda/mahasiswa. Hitung jumlah penggiat yang benar-benar aktif dan konsisten (bukan hanya terdaftar). Nilai dedikasi dan konsistensi: apakah hadir setiap ada kegiatan, punya inisiatif menggerakkan program baru, atau bahkan mengorbankan waktu pribadi untuk literasi masyarakat."
+        },
+        {
+          "Kode": "M4.2",
+          "Indikator": "Pengembangan Kapasitas Penggiat",
+          "Deskripsi": "Pelaksanaan pelatihan/workshop untuk meningkatkan kompetensi fasilitator dan penggiat literasi (storytelling, pengelolaan TBM, dll)",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak pernah ada pelatihan",
+            "2": "Pernah ada tapi sangat jarang (1x dalam 2 tahun)",
+            "3": "Ada pelatihan berkala (1-2x per tahun)",
+            "4": "Ada pelatihan rutin (3+ kali per tahun) dengan materi bervariasi"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan riwayat pelatihan yang pernah diikuti penggiat literasi dalam 1-2 tahun terakhir: pelatihan manajemen TBM, storytelling, menulis kreatif, digital literacy, atau pengembangan program literasi. Periksa dokumentasi pelatihan (sertifikat, foto, laporan). Nilai keberagaman materi pelatihan dan sumber pelatihan (pemerintah, NGO, perguruan tinggi). Amati dampak pelatihan pada kualitas program yang dijalankan."
+        },
+        {
+          "Kode": "M4.3",
+          "Indikator": "Pemberdayaan Penggiat oleh Pemerintah",
+          "Deskripsi": "Upaya pemerintah setempat dalam memberdayakan penggiat literasi (pengakuan, apresiasi, dukungan operasional)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada pengakuan/dukungan dari pemerintah",
+            "2": "Ada pengakuan informal tapi tidak ada dukungan nyata",
+            "3": "Ada apresiasi (penghargaan) dan sedikit dukungan operasional",
+            "4": "Ada sistem pemberdayaan komprehensif (honor, pelatihan, penghargaan rutin)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan bentuk dukungan pemerintah desa/kecamatan kepada penggiat literasi: apakah ada honor/insentif bagi pengelola TBM, pemberian penghargaan/piagam bagi penggiat aktif, atau dukungan operasional (transport, konsumsi saat kegiatan). Periksa SK pengangkatan pengelola TBM atau dokumen kesepakatan kerja sama. Nilai konsistensi dan keberlanjutan dukungan pemerintah terhadap penggiat."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "M5",
+      "Variabel": "Dampak pada Masyarakat",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "M5.1",
+          "Indikator": "Peningkatan Minat Baca Masyarakat",
+          "Deskripsi": "Peningkatan yang terlihat pada minat baca warga (kunjungan TBM, jumlah peminjaman, partisipasi kegiatan literasi)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada peningkatan minat baca",
+            "2": "Ada sedikit peningkatan (< 25% kunjungan/peminjaman)",
+            "3": "Ada peningkatan sedang (25-50%)",
+            "4": "Ada peningkatan signifikan (> 50%)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Bandingkan data kunjungan TBM/perpustakaan desa dan jumlah peminjaman buku sebelum dan sesudah program literasi intensif dilaksanakan. Amati antusiasme warga dalam kegiatan literasi: apakah peserta bertambah, ada warga yang proaktif meminta diadakan kegiatan, atau muncul budaya berbagi bacaan antar warga. Tanyakan persepsi penggiat dan tokoh masyarakat tentang perubahan minat baca warga."
+        },
+        {
+          "Kode": "M5.2",
+          "Indikator": "Penumbuhan Karakter Positif",
+          "Deskripsi": "Dampak kegiatan literasi pada penumbuhan karakter positif terutama pada anak dan remaja (empati, sopan santun, toleransi, kreativitas)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak terlihat dampak pada karakter",
+            "2": "Ada sedikit perubahan pada sebagian kecil anak",
+            "3": "Ada perubahan cukup terlihat pada banyak anak",
+            "4": "Ada perubahan signifikan dan meluas pada anak-remaja"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan kepada orang tua, guru, dan tokoh masyarakat: apakah anak-anak yang aktif di TBM/kegiatan literasi menunjukkan perubahan karakter positif. Amati contoh nyata: anak lebih sopan, lebih empati terhadap teman, lebih kreatif (membuat karya tulis/seni), atau lebih toleran terhadap perbedaan. Nilai seberapa luas dampak ini: hanya pada beberapa anak atau sudah menjadi perubahan di tingkat komunitas anak-remaja."
+        },
+        {
+          "Kode": "M5.3",
+          "Indikator": "Peningkatan Keterampilan Masyarakat",
+          "Deskripsi": "Dampak program literasi pada peningkatan keterampilan praktis masyarakat sesuai kearifan lokal (pertanian, kerajinan, kewirausahaan, kesehatan)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada peningkatan keterampilan",
+            "2": "Ada sedikit peningkatan pada 1 bidang",
+            "3": "Ada peningkatan pada 2 bidang keterampilan",
+            "4": "Ada peningkatan signifikan pada 3+ bidang keterampilan"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi program literasi yang berbasis keterampilan: pelatihan pertanian modern (baca panduan, adopsi teknologi), pelatihan kerajinan (ikuti tutorial), literasi finansial (pembukuan UMKM), atau literasi kesehatan (memahami informasi gizi, penyakit). Nilai dampak nyata: apakah ada warga yang menerapkan ilmu dan meningkat keterampilannya (hasil panen lebih baik, produk kerajinan lebih laku, pembukuan lebih rapi). Cari testimoni atau bukti konkret peningkatan ekonomi/kesejahteraan."
+        }
+      ]
+    }
+  ]
+}

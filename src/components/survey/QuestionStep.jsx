@@ -39,6 +39,12 @@ export default function QuestionStep({
 }) {
   const [selectedValue, setSelectedValue] = useState(value || null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showObservation, setShowObservation] = useState(false);
+
+  // Reset showObservation when question changes
+  useEffect(() => {
+    setShowObservation(false);
+  }, [question.kode]);
 
   // Sync state with props when question or value changes
   useEffect(() => {
@@ -70,15 +76,15 @@ export default function QuestionStep({
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-5xl">
           {/* Progress Bar - Glassmorphism */}
           <div className="mb-4 md:mb-8 backdrop-blur-xl bg-white/10 rounded-2xl p-3 md:p-4 border border-white/20 shadow-xl">
             <div className="flex justify-between items-center mb-1 md:mb-2">
+              <span className="text-xs md:text-sm font-black text-white uppercase tracking-widest">
+                {question.kode?.startsWith('S') ? 'EKOSISTEM SEKOLAH' : question.kode?.startsWith('K') ? 'EKOSISTEM KELUARGA' : 'EKOSISTEM MASYARAKAT'}
+              </span>
               <span className="text-xs md:text-sm font-medium text-white/90">
                 Pertanyaan {currentStep} dari {totalSteps}
-              </span>
-              <span className="text-sm font-bold text-[#7dcbe1]">
-                {Math.round((currentStep / totalSteps) * 100)}%
               </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-3 backdrop-blur-sm overflow-hidden">
@@ -90,26 +96,67 @@ export default function QuestionStep({
           </div>
 
           {/* Question Card - Glassmorphism */}
-          <div className="backdrop-blur-2xl bg-white/10 rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-5 md:p-8 mb-4 md:mb-6 transition-all duration-300 hover:shadow-cyan-500/20 hover:border-white/30">
-            {/* Question Kode Badge */}
-            <div className="inline-flex items-center backdrop-blur-xl bg-gradient-to-r from-[#39a0c9]/30 to-[#7dcbe1]/30 border border-white/30 px-3 py-1 md:px-4 md:py-2 rounded-full mb-3 md:mb-4 shadow-lg">
-              <span className="text-white font-bold text-xs md:text-sm tracking-wider">{question.kode}</span>
+          <div className="backdrop-blur-2xl bg-white/10 rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-5 md:p-10 mb-4 md:mb-6 transition-all duration-300">
+            {/* Header Content */}
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+              <div className="flex-1">
+                {/* Question Kode Badge */}
+                <div className="inline-flex items-center backdrop-blur-xl bg-gradient-to-r from-[#39a0c9]/30 to-[#7dcbe1]/30 border border-white/30 px-3 py-1 rounded-full mb-4 shadow-lg">
+                  <span className="text-white font-bold text-xs tracking-wider">{question.kode}</span>
+                </div>
+                
+                {/* Variabel Name */}
+                <h2 className="text-sm md:text-base font-black text-[#7dcbe1] uppercase tracking-widest mb-2 opacity-80">
+                  {question.variabel}
+                </h2>
+                
+                {/* Question Text */}
+                <h4 className="text-xl md:text-3xl font-extrabold text-white leading-tight mb-4">
+                  {question.indikator}
+                </h4>
+                
+                <p className="text-white/70 text-sm md:text-lg italic leading-relaxed">
+                  "{question.deskripsi}"
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3 shrink-0">
+                {question.observasi && (
+                  <button
+                    type="button"
+                    onClick={() => setShowObservation(!showObservation)}
+                    className={`
+                      flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold transition-all border
+                      ${showObservation 
+                        ? 'bg-[#39a0c9] text-white border-[#39a0c9] shadow-[0_0_20px_rgba(57,160,201,0.5)]' 
+                        : 'bg-white/5 text-[#7dcbe1] border-white/10 hover:bg-white/10'}
+                    `}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {showObservation ? 'Sembunyikan Tips' : 'Petunjuk Observasi'}
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Variabel Name */}
-            <h2 className="text-xl md:text-3xl font-bold text-white mb-2 md:mb-4 leading-tight">
-              {question.variabel}
-            </h2>
+            {/* Observation Guide Panel */}
+            {showObservation && question.observasi && (
+              <div className="mb-10 p-5 md:p-8 rounded-2xl bg-white/5 border-l-4 border-[#39a0c9] animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-2 h-2 bg-[#39a0c9] rounded-full animate-ping"></div>
+                  <h5 className="text-[#7dcbe1] font-black text-xs uppercase tracking-[0.2em]">Panduan Penilaian</h5>
+                </div>
+                <p className="text-white/90 text-sm md:text-base leading-relaxed">
+                  {question.observasi}
+                </p>
+              </div>
+            )}
 
-            {/* Question Text */}
-            <p className="text-white/90 text-sm md:text-lg mb-4 md:mb-8 leading-relaxed">
-              {question.indikator}
-            </p>
-
-
-
-            {/* Scale Options - Glassmorphism */}
-            <div className="space-y-2 md:space-y-3">
+            {/* Scale Options - Horizontal Grid on Desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {SCALE_OPTIONS.map((option) => {
                 const isSelected = selectedValue === option.value;
                 
@@ -118,65 +165,57 @@ export default function QuestionStep({
                     key={option.value}
                     onClick={() => handleSelect(option.value)}
                     className={`
-                      group w-full p-3 md:p-5 rounded-xl md:rounded-2xl transition-all duration-300
-                      backdrop-blur-xl border-2
+                      group relative p-5 md:p-8 rounded-2xl md:rounded-[2rem] transition-all duration-500
+                      backdrop-blur-xl border-2 flex flex-col items-center justify-center text-center gap-4
                       ${isSelected
-                        ? `bg-gradient-to-r ${option.gradient} border-white/50 shadow-2xl ${option.glow} scale-[1.02]`
-                        : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30 hover:scale-[1.01]'
+                        ? `bg-gradient-to-br ${option.gradient} border-white/60 shadow-2xl ${option.glow} scale-[1.03]`
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/30 hover:scale-[1.02]'
                       }
                       ${isAnimating && isSelected ? 'animate-pulse' : ''}
                     `}
                   >
-                    <div className="flex items-center">
-                      {/* Radio Indicator */}
-                      <div className={`
-                        relative w-5 h-5 md:w-7 md:h-7 rounded-full transition-all duration-300
-                        ${isSelected
-                          ? 'bg-white shadow-lg'
-                          : 'bg-white/20 border-2 border-white/40'
-                        }
-                      `}>
-                        {isSelected && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full bg-gradient-to-br ${option.gradient}`}></div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Label */}
-                      <div className="ml-3 md:ml-4 flex-1 text-left">
-                        <span className={`
-                          text-sm md:text-lg leading-tight block
-                          ${isSelected ? 'text-white' : 'text-white/80'}
-                        `}>
-                            {(() => {
-                              if (question.skala_detail) {
-                                const lines = question.skala_detail.split('\n');
-                                const line = lines.find(l => l.trim().startsWith(`${option.value}:`));
-                                if (line) return line.split(':')[1].trim();
-                              }
-                              return option.label;
-                            })()}
-                          </span>
-                        </div>
-
-                      {/* Glow Indicator */}
+                    {/* Visual Marker */}
+                    <div className={`
+                      w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-500
+                      ${isSelected ? 'bg-white border-white' : 'bg-white/10 border-white/20'}
+                    `}>
                       {isSelected && (
-                        <div className={`w-4 h-4 rounded-full bg-gradient-to-br ${option.gradient} shadow-lg ${option.glow} animate-pulse`}></div>
+                        <svg className={`w-4 h-4 text-transparent bg-clip-text bg-gradient-to-br ${option.gradient}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                        </svg>
                       )}
                     </div>
+
+                    <span className={`
+                      text-sm md:text-sm font-black leading-snug uppercase tracking-wide
+                      ${isSelected ? 'text-white' : 'text-white/60'}
+                    `}>
+                        {(() => {
+                          if (question.skala_detail) {
+                            const lines = question.skala_detail.split('\n');
+                            const line = lines.find(l => {
+                              const trimmed = l.trim();
+                              return trimmed.startsWith(`${option.value} =`) || trimmed.startsWith(`${option.value} :`) || trimmed.startsWith(`${option.value}:`);
+                            });
+                            if (line) {
+                              const parts = line.split(/[=:]/);
+                              return parts[parts.length - 1].trim();
+                            }
+                          }
+                          return option.label;
+                        })()}
+                      </span>
                   </button>
                 );
               })}
             </div>
-
           </div>
 
           {/* Navigation Buttons - Glassmorphism */}
-          <div className="flex gap-3 md:gap-4">
+          <div className="flex gap-4">
             <button
               onClick={onPrev}
-              className="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all duration-300 backdrop-blur-xl border-2 bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/50 hover:shadow-lg hover:scale-[1.02]"
+              className="flex-1 py-4 md:py-6 rounded-2xl md:rounded-[1.5rem] font-black uppercase tracking-widest transition-all duration-300 backdrop-blur-xl border-2 bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/30 hover:scale-[1.02]"
             >
               ← Kembali
             </button>
@@ -185,21 +224,21 @@ export default function QuestionStep({
               onClick={handleNext}
               disabled={selectedValue === null}
               className={`
-                flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all duration-300
+                flex-1 py-4 md:py-6 rounded-2xl md:rounded-[1.5rem] font-black uppercase tracking-widest transition-all duration-300
                 backdrop-blur-xl border-2
                 ${selectedValue === null
-                  ? 'bg-white/5 text-white/30 border-white/10 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#39a0c9] to-[#7dcbe1] text-white border-white/30 hover:shadow-2xl hover:shadow-cyan-500/50 hover:scale-[1.02]'
+                  ? 'bg-white/5 text-white/20 border-white/10 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-[#39a0c9] to-[#7dcbe1] text-white border-white/30 hover:shadow-[0_0_40px_rgba(57,160,201,0.4)] hover:scale-[1.02]'
                 }
               `}
             >
-              {currentStep === totalSteps ? 'Review →' : 'Lanjut →'}
+              {currentStep === totalSteps ? 'Review Jawaban →' : 'Lanjut →'}
             </button>
           </div>
 
           {/* Logo Watermark */}
-          <div className="mt-4 md:mt-8 text-center">
-            <p className="text-white/50 text-[10px] md:text-sm">Sekolah Literasi Indonesia</p>
+          <div className="mt-8 text-center opacity-30">
+            <p className="text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em]">Sekolah Literasi Indonesia</p>
           </div>
         </div>
       </div>

@@ -1,22 +1,40 @@
 // src/utils/constants.js
-import instrumentData from '../../Instrumen_Literasi_REVISI_15_Indikator.json';
+import sekolahData from '../../json/sekolah.json';
+import keluargaData from '../../json/keluarga.json';
+import masyarakatData from '../../json/masyarakat.json';
 
-// Mapping data dari JSON ke format yang digunakan aplikasi
-export const SURVEY_QUESTIONS = instrumentData["Instrumen Literasi (Revisi)"].reduce((acc, item) => {
-  const lingkup = item.Lingkup;
-  if (!acc[lingkup]) acc[lingkup] = [];
-  
-  acc[lingkup].push({
-    kode: item.Kode,
-    variabel: item.Variabel,
-    indikator: item.Indikator,
-    tipe_skala: item["Tipe Skala"],
-    skala_detail: item["Skala Scoring (1-4)"],
-    bobot: item.Bobot
+// Helper function untuk meratakan (flatten) data dari struktur Variabel > Indikator
+const flattenIndicators = (data) => {
+  const flattened = [];
+  data.Variabel.forEach(v => {
+    v.Indikator.forEach(ind => {
+      flattened.push({
+        kode: ind.Kode,
+        variabel: v.Variabel,
+        indikator: ind.Indikator,
+        deskripsi: ind.Deskripsi,
+        tipe_skala: ind.Tipe_Skala,
+        // Konversi Skala_Scoring object ke string format lama agar kompatibel dengan sistem label dinamis kita
+        skala_detail: Object.entries(ind.Skala_Scoring)
+          .map(([key, val]) => `${key} = ${val}`)
+          .join('\n'),
+        bobot: ind.Bobot,
+        observasi: ind.Observasi,
+        kode_variabel: v.Kode_Variabel
+      });
+    });
   });
-  
-  return acc;
-}, {});
+  return flattened;
+};
 
-// Export data mentah jika dibutuhkan untuk referensi lain
-export const RAW_INSTRUMENT_DATA = instrumentData["Instrumen Literasi (Revisi)"];
+export const SURVEY_QUESTIONS = {
+  SEKOLAH: flattenIndicators(sekolahData),
+  KELUARGA: flattenIndicators(keluargaData),
+  MASYARAKAT: flattenIndicators(masyarakatData)
+};
+
+export const RAW_DATA = {
+  SEKOLAH: sekolahData,
+  KELUARGA: keluargaData,
+  MASYARAKAT: masyarakatData
+};

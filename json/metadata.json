@@ -1,0 +1,97 @@
+{
+  "Instrumen": {
+    "Judul": "Instrumen Survey Ekosistem Literasi",
+    "Versi": "Revisi - 45 Indikator",
+    "Deskripsi": "Pemecahan dari 15 variabel menjadi 45 indikator spesifik dengan panduan observasi",
+    "Total_Indikator": 45,
+    "Distribusi_Indikator": {
+      "Sekolah": 15,
+      "Keluarga": 15,
+      "Masyarakat": 15
+    },
+    "Estimasi_Waktu_Pengisian": "8-10 menit"
+  },
+  "Tipe_Skala_Scoring": {
+    "Tipe_1": {
+      "Nama": "Ada/Tidak + Kualitas",
+      "Deskripsi": "Mengukur keberadaan dan tingkat kualitas",
+      "Skala": {
+        "1": "Tidak ada",
+        "2": "Ada tapi belum optimal",
+        "3": "Ada dan cukup baik",
+        "4": "Ada dan sangat baik"
+      }
+    },
+    "Tipe_2": {
+      "Nama": "Frekuensi",
+      "Deskripsi": "Mengukur seberapa sering aktivitas dilakukan",
+      "Skala": {
+        "1": "Tidak pernah",
+        "2": "Jarang (1-2x per bulan)",
+        "3": "Sering (1-2x per minggu)",
+        "4": "Sangat sering (hampir setiap hari)"
+      }
+    },
+    "Tipe_3": {
+      "Nama": "Cakupan/Partisipasi",
+      "Deskripsi": "Mengukur seberapa luas cakupan atau partisipasi",
+      "Skala": {
+        "1": "Tidak ada/sangat terbatas",
+        "2": "Sebagian kecil",
+        "3": "Sebagian besar",
+        "4": "Hampir semua/sangat luas"
+      }
+    },
+    "Tipe_4": {
+      "Nama": "Persepsi Dampak",
+      "Deskripsi": "Mengukur persepsi terhadap dampak yang dirasakan",
+      "Skala": {
+        "1": "Tidak ada dampak",
+        "2": "Dampak kecil",
+        "3": "Dampak sedang",
+        "4": "Dampak besar"
+      }
+    }
+  },
+  "Petunjuk_Penggunaan": {
+    "Cara_Scoring": "Setiap indikator diberi skor 1-4 sesuai skala yang ditentukan. Skor indikator dikalikan dengan bobot untuk mendapat nilai tertimbang.",
+    "Perhitungan_Skor_Variabel": "Skor variabel = Σ(skor indikator × bobot indikator)",
+    "Perhitungan_Skor_Lingkup": "Skor lingkup = Σ(skor variabel × bobot variabel)",
+    "Skor_Maksimal_Per_Lingkup": 4.0,
+    "Catatan": "Setiap lingkup memiliki skor maksimal 4.0 (jika semua indikator mendapat skor 4)",
+    "Interpretasi_Skor": {
+      "3.5 - 4.0": {
+        "Kategori": "Sangat Baik",
+        "Deskripsi": "Ekosistem literasi sangat baik dan optimal"
+      },
+      "2.5 - 3.49": {
+        "Kategori": "Baik",
+        "Deskripsi": "Ekosistem literasi baik, perlu sedikit peningkatan"
+      },
+      "1.5 - 2.49": {
+        "Kategori": "Cukup",
+        "Deskripsi": "Ekosistem literasi cukup, perlu peningkatan signifikan"
+      },
+      "1.0 - 1.49": {
+        "Kategori": "Kurang",
+        "Deskripsi": "Ekosistem literasi kurang, perlu intervensi serius"
+      }
+    }
+  },
+  "Dimensi_Literasi": {
+    "Deskripsi": "6 dimensi literasi yang tercakup dalam instrumen",
+    "Dimensi": [
+      "Literasi Baca-Tulis (Literasi Dasar)",
+      "Literasi Numerasi",
+      "Literasi Sains",
+      "Literasi Digital",
+      "Literasi Finansial",
+      "Literasi Budaya dan Kewargaan"
+    ]
+  },
+  "File_Reference": {
+    "sekolah": "sekolah.json - 15 indikator untuk lingkup Sekolah",
+    "keluarga": "keluarga.json - 15 indikator untuk lingkup Keluarga",
+    "masyarakat": "masyarakat.json - 15 indikator untuk lingkup Masyarakat"
+  }
+}

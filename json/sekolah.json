@@ -1,0 +1,253 @@
+{
+  "Lingkup": "SEKOLAH",
+  "Total_Indikator": 15,
+  "Total_Variabel": 5,
+  "Total_Bobot": 1.0,
+  "Variabel": [
+    {
+      "Kode_Variabel": "S1",
+      "Variabel": "Program & Kebijakan Literasi",
+      "Bobot_Variabel": 0.25,
+      "Indikator": [
+        {
+          "Kode": "S1.1",
+          "Indikator": "Perencanaan Program Literasi",
+          "Deskripsi": "Sekolah memiliki dokumen perencanaan program literasi yang jelas (visi, misi, tujuan, target, timeline)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada dokumen perencanaan",
+            "2": "Ada dokumen tapi tidak lengkap/detail",
+            "3": "Ada dokumen lengkap tapi belum tersosialisasi",
+            "4": "Ada dokumen lengkap dan tersosialisasi dengan baik"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Cermati keberadaan dokumen tertulis program literasi sekolah. Periksa apakah dokumen mencakup visi-misi literasi, tujuan yang terukur, target capaian, dan timeline pelaksanaan. Nilai juga sejauh mana dokumen ini dipahami dan disosialisasikan kepada seluruh warga sekolah (guru, siswa, tenaga kependidikan)."
+        },
+        {
+          "Kode": "S1.2",
+          "Indikator": "Komprehensivitas & Kebijakan Formal",
+          "Deskripsi": "Program literasi mencakup berbagai dimensi (baca-tulis, numerasi, sains, digital, finansial, budaya) dan didukung SK/kebijakan resmi",
+          "Tipe_Skala": "Tipe 3: Cakupan + Kualitas",
+          "Skala_Scoring": {
+            "1": "Hanya 1-2 dimensi literasi, tanpa SK formal",
+            "2": "3-4 dimensi literasi, belum ada SK formal",
+            "3": "5 dimensi literasi, ada SK tapi belum operasional",
+            "4": "6 dimensi literasi lengkap, ada SK yang operasional"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Identifikasi dimensi literasi apa saja yang tercakup dalam program sekolah: literasi baca-tulis, numerasi, sains, digital, finansial, dan budaya-kewargaan. Periksa keberadaan Surat Keputusan atau kebijakan resmi kepala sekolah yang menjadi dasar hukum pelaksanaan program. Nilai apakah kebijakan tersebut hanya formalitas atau benar-benar menjadi pedoman operasional."
+        },
+        {
+          "Kode": "S1.3",
+          "Indikator": "Partisipasi Warga Sekolah",
+          "Deskripsi": "Keterlibatan aktif seluruh komponen warga sekolah (kepala sekolah, guru, siswa, tenaga kependidikan, komite) dalam program literasi",
+          "Tipe_Skala": "Tipe 3: Cakupan Partisipasi",
+          "Skala_Scoring": {
+            "1": "Hanya 1-2 komponen yang terlibat",
+            "2": "3 komponen terlibat tapi tidak rutin",
+            "3": "4 komponen terlibat secara rutin",
+            "4": "Semua komponen (5+) terlibat aktif dan konsisten"
+          },
+          "Bobot": 0.084,
+          "Observasi": "Amati tingkat partisipasi berbagai komponen sekolah dalam kegiatan literasi. Perhatikan peran kepala sekolah (sebagai champion/motivator), guru (sebagai pelaksana), siswa (sebagai subjek aktif), tenaga kependidikan (pustakawan, laboran), dan komite sekolah (dukungan kebijakan). Nilai konsistensi dan keaktifan keterlibatan mereka dalam berbagai kegiatan literasi."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "S2",
+      "Variabel": "Pelaksanaan & Integrasi Pembelajaran",
+      "Bobot_Variabel": 0.25,
+      "Indikator": [
+        {
+          "Kode": "S2.1",
+          "Indikator": "Integrasi Literasi dalam Pembelajaran",
+          "Deskripsi": "Guru mengintegrasikan aktivitas literasi (membaca, menulis, berpikir kritis) ke dalam rencana dan proses pembelajaran di kelas",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak pernah/jarang terintegrasi dalam RPP",
+            "2": "Kadang-kadang (1-2 mapel saja)",
+            "3": "Sering (3-4 mapel secara konsisten)",
+            "4": "Sangat sering (hampir semua mapel terintegrasi)"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Periksa Rencana Pelaksanaan Pembelajaran (RPP) dan observasi kelas untuk melihat bagaimana guru mengintegrasikan literasi dalam pembelajaran. Amati apakah ada kegiatan membaca teks, menulis refleksi, diskusi kritis, atau tugas berbasis literasi. Nilai konsistensi integrasi ini di berbagai mata pelajaran, tidak hanya bahasa Indonesia."
+        },
+        {
+          "Kode": "S2.2",
+          "Indikator": "Pembiasaan Literasi Rutin",
+          "Deskripsi": "Pelaksanaan kegiatan pembiasaan literasi secara konsisten (mis: membaca 15 menit sebelum pelajaran, jurnal harian, presentasi)",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak ada kegiatan pembiasaan rutin",
+            "2": "Ada tapi tidak konsisten (1-2x per bulan)",
+            "3": "Cukup konsisten (1-2x per minggu)",
+            "4": "Sangat konsisten (hampir setiap hari)"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Identifikasi kegiatan pembiasaan literasi yang dilakukan rutin di sekolah, seperti: membaca verstehen/15 menit sebelum pelajaran, membuat jurnal membaca/harian, presentasi buku, bedah buku, atau kliping berita. Nilai frekuensi dan konsistensi pelaksanaannya. Perhatikan apakah semua kelas melaksanakan atau hanya kelas tertentu."
+        },
+        {
+          "Kode": "S2.3",
+          "Indikator": "Program Berbasis Kearifan Lokal/Budaya",
+          "Deskripsi": "Pengembangan program literasi yang mengangkat dan memanfaatkan kearifan lokal, budaya daerah, atau karakteristik unik sekolah",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada program berbasis kearifan lokal",
+            "2": "Ada tapi hanya sporadis/insidental",
+            "3": "Ada program terstruktur (1-2 kegiatan rutin)",
+            "4": "Ada program komprehensif (3+ kegiatan terintegrasi)"
+          },
+          "Bobot": 0.084,
+          "Observasi": "Cari kegiatan literasi yang mengangkat kearifan lokal seperti: membaca cerita rakyat daerah, penulisan dalam bahasa daerah, dokumentasi budaya lokal, penelitian sejarah lokal, atau proyek literasi berbasis isu lokal. Nilai apakah ini hanya kegiatan sesekali (misal saat perayaan tertentu) atau sudah menjadi bagian integral dari program literasi sekolah."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "S3",
+      "Variabel": "Sarana & Infrastruktur Literasi",
+      "Bobot_Variabel": 0.2,
+      "Indikator": [
+        {
+          "Kode": "S3.1",
+          "Indikator": "Perpustakaan Sekolah",
+          "Deskripsi": "Keberadaan dan kualitas perpustakaan sekolah: koleksi memadai, sistem pengelolaan baik, suasana kondusif, jam operasional memadai",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada perpustakaan/hanya ruang kosong",
+            "2": "Ada tapi koleksi minim dan pengelolaan buruk",
+            "3": "Ada dengan koleksi cukup dan pengelolaan baik",
+            "4": "Ada dengan koleksi lengkap, sistem modern, suasana kondusif"
+          },
+          "Bobot": 0.067,
+          "Observasi": "Observasi perpustakaan sekolah secara langsung. Nilai ketersediaan dan keragaman koleksi buku (fiksi, nonfiksi, referensi, untuk berbagai tingkat kelas). Periksa sistem pengelolaan (katalog, sistem peminjaman, petugas terlatih). Amati kondisi fisik ruangan (kebersihan, pencahayaan, ventilasi, kenyamanan). Tanyakan jam operasional dan tingkat pemanfaatan oleh siswa."
+        },
+        {
+          "Kode": "S3.2",
+          "Indikator": "Pojok Baca & Ruang Literasi",
+          "Deskripsi": "Ketersediaan pojok baca di tiap kelas, area baca di koridor/taman, mading/display karya siswa yang aktif dikelola",
+          "Tipe_Skala": "Tipe 3: Cakupan + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada pojok baca/area literasi",
+            "2": "Ada di beberapa kelas saja (< 50%)",
+            "3": "Ada di sebagian besar kelas + 1 area publik",
+            "4": "Ada di semua kelas + area publik + mading aktif"
+          },
+          "Bobot": 0.067,
+          "Observasi": "Cek keberadaan pojok baca di setiap kelas: rak buku kecil dengan koleksi yang diperbarui berkala. Identifikasi area baca di luar kelas seperti taman baca, sudut baca koridor, atau gazebo baca. Perhatikan keberadaan dan pemanfaatan mading/papan display untuk pajang karya siswa (puisi, cerpen, essai, poster). Nilai apakah ini hanya pajangan mati atau benar-benar dikelola dan diperbarui secara aktif."
+        },
+        {
+          "Kode": "S3.3",
+          "Indikator": "Bahan Bacaan Berkualitas & Bervariasi",
+          "Deskripsi": "Ketersediaan bahan bacaan yang berkualitas (sesuai usia, konten edukatif) dan bervariasi (fiksi, nonfiksi, digital, majalah)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Sangat minim atau tidak sesuai usia siswa",
+            "2": "Ada tapi terbatas (1-2 jenis: buku teks saja)",
+            "3": "Cukup bervariasi (buku fiksi, nonfiksi, majalah)",
+            "4": "Sangat bervariasi (buku, digital, majalah, koran, ensiklopedia)"
+          },
+          "Bobot": 0.066,
+          "Observasi": "Inventarisasi jenis bahan bacaan yang tersedia: buku fiksi (cerita, novel), nonfiksi (ensiklopedia, biografi), buku pengayaan, majalah/koran, dan sumber digital (e-book, artikel online). Nilai kesesuaian konten dengan tingkat usia dan kebutuhan siswa. Periksa kondisi fisik bahan bacaan (layak baca/rusak) dan frekuensi pembaruan koleksi (ada penambahan buku baru atau tidak)."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "S4",
+      "Variabel": "Kapasitas & Komunitas Literasi",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "S4.1",
+          "Indikator": "Tim Literasi Sekolah",
+          "Deskripsi": "Keberadaan dan keaktifan tim literasi sekolah dengan pembagian tugas jelas, rapat rutin, dan program kerja terstruktur",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada tim literasi",
+            "2": "Ada tim tapi tidak ada program kerja",
+            "3": "Ada tim dengan program kerja tapi jarang rapat",
+            "4": "Ada tim aktif dengan program kerja dan evaluasi rutin"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi keberadaan tim literasi atau tim pengembang literasi sekolah. Periksa SK pembentukan tim, struktur organisasi, dan pembagian tugas yang jelas. Nilai keaktifan tim melalui dokumen rapat/notulen, program kerja tahunan, dan laporan kegiatan. Tanyakan frekuensi rapat koordinasi dan mekanisme evaluasi program yang dilakukan tim."
+        },
+        {
+          "Kode": "S4.2",
+          "Indikator": "Pengembangan Kapasitas Guru",
+          "Deskripsi": "Pelaksanaan pelatihan/workshop literasi untuk guru secara berkelanjutan (internal/eksternal, minimal 1-2x per tahun)",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak pernah ada pelatihan literasi",
+            "2": "Pernah ada tapi hanya 1x dalam 2 tahun terakhir",
+            "3": "Ada 1-2x per tahun, tapi belum semua guru",
+            "4": "Ada rutin (2+ kali per tahun), melibatkan semua guru"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Cek dokumentasi pelatihan literasi yang pernah diikuti guru dalam 1-2 tahun terakhir: daftar hadir, materi pelatihan, sertifikat. Tanyakan sumber pelatihan (internal sekolah, MGMP, dinas, lembaga eksternal). Nilai cakupan peserta pelatihan (berapa persen guru yang sudah terlatih) dan tindak lanjut pasca pelatihan (apakah ilmu diterapkan dalam pembelajaran)."
+        },
+        {
+          "Kode": "S4.3",
+          "Indikator": "Kolaborasi dengan Orang Tua & Masyarakat",
+          "Deskripsi": "Keterlibatan orang tua dan komunitas masyarakat dalam mendukung program literasi sekolah (donasi buku, volunteer, kegiatan bersama)",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Cakupan",
+          "Skala_Scoring": {
+            "1": "Tidak ada kolaborasi dengan eksternal",
+            "2": "Ada tapi sangat jarang (hanya saat acara tertentu)",
+            "3": "Ada kolaborasi rutin dengan orang tua/masyarakat",
+            "4": "Ada kolaborasi intensif, terstruktur, dan berkelanjutan"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi bentuk keterlibatan orang tua dan masyarakat dalam literasi sekolah: donasi buku, menjadi relawan/tutor baca, narasumber kegiatan literasi, atau kemitraan dengan komunitas literasi setempat. Nilai frekuensi dan keberlanjutan kolaborasi ini. Periksa apakah ada program khusus yang melibatkan orang tua seperti family reading program atau parenting literasi."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "S5",
+      "Variabel": "Dampak Program Literasi",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "S5.1",
+          "Indikator": "Peningkatan Minat Baca",
+          "Deskripsi": "Peningkatan yang terlihat pada minat baca siswa (frekuensi kunjungan perpustakaan, jumlah buku dipinjam, partisipasi kegiatan literasi)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada peningkatan minat baca",
+            "2": "Ada sedikit peningkatan (kurang dari 25%)",
+            "3": "Ada peningkatan sedang (25-50%)",
+            "4": "Ada peningkatan signifikan (lebih dari 50%)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Bandingkan data kunjungan perpustakaan dan jumlah buku dipinjam sebelum dan sesudah program literasi berjalan. Amati antusiasme siswa dalam mengikuti kegiatan literasi (lomba baca, bedah buku, book fair). Tanyakan persepsi guru dan pustakawan tentang perubahan perilaku membaca siswa. Jika memungkinkan, lihat data statistik peminjaman buku."
+        },
+        {
+          "Kode": "S5.2",
+          "Indikator": "Peningkatan Kompetensi Literasi",
+          "Deskripsi": "Peningkatan kemampuan literasi siswa (kemampuan membaca pemahaman, menulis, berpikir kritis, presentasi)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak terlihat peningkatan kompetensi",
+            "2": "Ada peningkatan pada sebagian kecil siswa",
+            "3": "Ada peningkatan pada sebagian besar siswa",
+            "4": "Ada peningkatan signifikan pada hampir semua siswa"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Nilai peningkatan kemampuan literasi siswa berdasarkan observasi kelas dan penilaian guru: kemampuan memahami teks semakin baik, kualitas tulisan/karya meningkat, lebih kritis dalam berdiskusi, atau lebih percaya diri presentasi. Jika ada, lihat data hasil asesmen literasi sekolah atau nilai mata pelajaran yang terkait. Tanyakan testimoni guru tentang perubahan yang mereka amati."
+        },
+        {
+          "Kode": "S5.3",
+          "Indikator": "Peningkatan Prestasi Akademik",
+          "Deskripsi": "Dampak program literasi terhadap prestasi akademik siswa (nilai rata-rata, ranking lomba, hasil ujian)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada korelasi dengan prestasi akademik",
+            "2": "Ada sedikit peningkatan nilai beberapa mapel",
+            "3": "Ada peningkatan nilai rata-rata kelas",
+            "4": "Ada peningkatan signifikan prestasi akademik dan non-akademik"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Bandingkan data prestasi akademik siswa (nilai rapor, hasil ujian) sebelum dan sesudah program literasi intensif. Amati juga prestasi non-akademik yang terkait literasi: juara lomba menulis, cerdas cermat, olimpiade sains, dll. Tanyakan persepsi kepala sekolah dan guru tentang kontribusi program literasi terhadap peningkatan prestasi. Perhatikan bahwa dampak ini bersifat jangka panjang."
+        }
+      ]
+    }
+  ]
+}

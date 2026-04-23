@@ -1,0 +1,253 @@
+{
+  "Lingkup": "KELUARGA",
+  "Total_Indikator": 15,
+  "Total_Variabel": 5,
+  "Total_Bobot": 1.0,
+  "Variabel": [
+    {
+      "Kode_Variabel": "K1",
+      "Variabel": "Aktivitas Literasi Keluarga",
+      "Bobot_Variabel": 0.3,
+      "Indikator": [
+        {
+          "Kode": "K1.1",
+          "Indikator": "Literasi Baca-Tulis & Numerasi",
+          "Deskripsi": "Frekuensi aktivitas membaca bersama, menulis (jurnal/cerita), dan aktivitas numerasi (menghitung belanja, mengatur uang saku) dalam keluarga",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak pernah/sangat jarang",
+            "2": "Kadang-kadang (1-2x per bulan)",
+            "3": "Sering (1-2x per minggu)",
+            "4": "Sangat sering (hampir setiap hari)"
+          },
+          "Bobot": 0.1,
+          "Observasi": "Tanyakan frekuensi kegiatan membaca bersama di rumah (membacakan cerita sebelum tidur, membaca buku bersama di akhir pekan). Amati kebiasaan menulis dalam keluarga: membuat daftar belanja, menulis jurnal harian, atau menulis surat/cerita. Untuk numerasi, tanyakan apakah anak dilibatkan dalam aktivitas menghitung (menghitung uang belanja, mengelola uang saku, mengukur takaran masak)."
+        },
+        {
+          "Kode": "K1.2",
+          "Indikator": "Literasi Sains, Digital & Finansial",
+          "Deskripsi": "Frekuensi aktivitas sains (eksperimen sederhana, diskusi fenomena alam), digital (mencari info online, coding), dan finansial (menabung, belanja bijak)",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Variasi",
+          "Skala_Scoring": {
+            "1": "Tidak pernah melakukan aktivitas ini",
+            "2": "Kadang-kadang, hanya 1 jenis literasi",
+            "3": "Sering, melakukan 2 jenis literasi",
+            "4": "Sangat sering, melakukan 3 jenis literasi secara rutin"
+          },
+          "Bobot": 0.1,
+          "Observasi": "Literasi sains: tanyakan apakah keluarga melakukan eksperimen sederhana di rumah (menanam tanaman, membuat slime), mendiskusikan fenomena alam, atau menonton program edukasi sains. Literasi digital: apakah anak diajarkan mencari informasi online dengan aman, menggunakan aplikasi edukatif, atau belajar coding dasar. Literasi finansial: apakah anak diajak menabung, diajarkan membedakan kebutuhan dan keinginan, atau dilibatkan dalam perencanaan belanja keluarga."
+        },
+        {
+          "Kode": "K1.3",
+          "Indikator": "Literasi Budaya & Kewargaan",
+          "Deskripsi": "Frekuensi aktivitas budaya (mengunjungi museum, belajar tradisi lokal) dan kewargaan (diskusi isu sosial, gotong royong, peduli lingkungan)",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak pernah/sangat jarang",
+            "2": "Kadang-kadang (1-2x per semester)",
+            "3": "Sering (1x per bulan)",
+            "4": "Sangat sering (2+ kali per bulan)"
+          },
+          "Bobot": 0.1,
+          "Observasi": "Literasi budaya: tanyakan apakah keluarga mengunjungi tempat bersejarah/museum, mengikuti pertunjukan seni/budaya lokal, atau belajar kesenian tradisional bersama. Literasi kewargaan: apakah keluarga mendiskusikan isu-isu sosial/berita terkini dengan anak, melibatkan anak dalam kegiatan sosial (gotong royong, berbagi dengan tetangga), atau mengajarkan kepedulian lingkungan (memilah sampah, menanam pohon)."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "K2",
+      "Variabel": "Sarana & Investasi Literasi",
+      "Bobot_Variabel": 0.25,
+      "Indikator": [
+        {
+          "Kode": "K2.1",
+          "Indikator": "Bahan Bacaan Keluarga",
+          "Deskripsi": "Ketersediaan dan variasi bahan bacaan untuk anak dan dewasa di rumah (buku cerita, ensiklopedia, majalah, koran)",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada/sangat minim (< 10 buku)",
+            "2": "Ada tapi terbatas (10-25 buku, 1 jenis)",
+            "3": "Ada dan cukup (25-50 buku, 2-3 jenis)",
+            "4": "Ada dan sangat memadai (50+ buku, bervariasi)"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Observasi atau tanyakan ketersediaan bahan bacaan di rumah. Hitung jumlah buku yang dimiliki dan jenis-jenisnya: buku cerita anak, buku pelajaran, ensiklopedia, majalah anak, komik edukatif, novel dewasa, atau koran. Nilai juga kesesuaian bahan bacaan dengan usia anak dan apakah koleksi diperbarui secara berkala (ada pembelian buku baru atau tidak)."
+        },
+        {
+          "Kode": "K2.2",
+          "Indikator": "Pojok Baca & Perangkat Digital",
+          "Deskripsi": "Keberadaan ruang/pojok baca khusus di rumah dan akses perangkat digital (gadget, komputer, internet) untuk aktivitas literasi",
+          "Tipe_Skala": "Tipe 1: Ada/Tidak + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak ada pojok baca dan perangkat digital",
+            "2": "Ada salah satu (pojok baca OR perangkat digital)",
+            "3": "Ada keduanya tapi belum optimal (pojok baca sederhana + akses internet terbatas)",
+            "4": "Ada keduanya dengan optimal (pojok baca nyaman + perangkat memadai + internet stabil)"
+          },
+          "Bobot": 0.083,
+          "Observasi": "Pojok baca: periksa apakah ada ruang khusus atau sudut tertentu di rumah yang difungsikan untuk membaca (rak buku, meja baca, pencahayaan cukup, suasana nyaman). Perangkat digital: tanyakan ketersediaan gadget/komputer untuk anak belajar, akses internet di rumah, dan aplikasi edukatif yang digunakan. Nilai apakah penggunaan perangkat digital diawasi dan dibatasi secara bijak oleh orang tua."
+        },
+        {
+          "Kode": "K2.3",
+          "Indikator": "Alokasi Anggaran Literasi",
+          "Deskripsi": "Keluarga mengalokasikan anggaran khusus untuk mendukung aktivitas literasi (beli buku, langganan media, kursus)",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Jumlah",
+          "Skala_Scoring": {
+            "1": "Tidak ada alokasi anggaran khusus",
+            "2": "Ada tapi sangat jarang (1-2x per tahun)",
+            "3": "Ada dan cukup rutin (setiap 2-3 bulan)",
+            "4": "Ada dan sangat rutin (bulanan, ada pos khusus)"
+          },
+          "Bobot": 0.084,
+          "Observasi": "Tanyakan apakah keluarga secara sadar mengalokasikan dana untuk literasi: pembelian buku rutin, berlangganan majalah anak/koran, membership perpustakaan digital, atau mengikutkan anak pada kursus yang mendukung literasi (menulis kreatif, coding, bahasa). Nilai konsistensi dan besaran relatif alokasi ini dibanding pengeluaran lain. Tidak perlu nominal pasti, cukup persepsi apakah ini dianggap penting dalam anggaran keluarga."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "K3",
+      "Variabel": "Partisipasi & Keterlibatan Keluarga",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "K3.1",
+          "Indikator": "Keterlibatan Orang Tua",
+          "Deskripsi": "Tingkat keaktifan orang tua (ayah dan ibu) dalam mendampingi dan memfasilitasi aktivitas literasi anak di rumah",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak pernah/sangat jarang mendampingi",
+            "2": "Kadang-kadang, hanya salah satu orang tua",
+            "3": "Sering, keduanya terlibat bergantian",
+            "4": "Sangat sering, keduanya aktif dan konsisten"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan intensitas keterlibatan ayah dan ibu dalam aktivitas literasi anak: membacakan cerita, menemani belajar, mendiskusikan bacaan, atau mengajak ke perpustakaan/toko buku. Nilai apakah hanya ibu yang aktif atau ayah juga terlibat. Perhatikan kualitas pendampingan: apakah hanya pasif (menyuruh baca) atau aktif (berdialog, bertanya, memberi feedback)."
+        },
+        {
+          "Kode": "K3.2",
+          "Indikator": "Partisipasi Anak",
+          "Deskripsi": "Tingkat keaktifan anak-anak dalam mengikuti dan merespons kegiatan literasi keluarga dengan antusias",
+          "Tipe_Skala": "Tipe 3: Cakupan + Antusiasme",
+          "Skala_Scoring": {
+            "1": "Anak tidak tertarik/dipaksa",
+            "2": "Anak ikut tapi pasif (hanya 1 anak yang aktif)",
+            "3": "Sebagian besar anak cukup antusias",
+            "4": "Semua anak sangat antusias dan proaktif"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Amati atau tanyakan respons anak terhadap kegiatan literasi keluarga: apakah anak menunjukkan antusiasme (meminta dibacakan cerita, mengajak diskusi), atau harus dipaksa/disuruh berkali-kali. Jika ada lebih dari 1 anak, nilai apakah semua terlibat atau hanya anak tertentu. Perhatikan inisiatif anak: apakah anak pernah secara mandiri memilih buku untuk dibaca atau mengusulkan kegiatan literasi."
+        },
+        {
+          "Kode": "K3.3",
+          "Indikator": "Keterlibatan Anggota Keluarga Lain",
+          "Deskripsi": "Partisipasi anggota keluarga lain (kakek/nenek, kakak/adik, atau anggota keluarga besar) dalam ekosistem literasi keluarga",
+          "Tipe_Skala": "Tipe 3: Cakupan Partisipasi",
+          "Skala_Scoring": {
+            "1": "Tidak ada anggota lain yang terlibat",
+            "2": "Ada 1 anggota keluarga lain yang sesekali terlibat",
+            "3": "Ada 2-3 anggota keluarga lain terlibat rutin",
+            "4": "Banyak anggota keluarga (4+ orang) aktif terlibat"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi anggota keluarga di luar orang tua-anak yang juga terlibat dalam aktivitas literasi: kakek/nenek yang membacakan dongeng, kakak yang membantu adik belajar membaca, atau sepupu yang suka tukar-menukar buku. Nilai apakah ini hanya kejadian sesekali atau sudah menjadi kebiasaan keluarga besar. Ini menunjukkan budaya literasi yang mengakar di keluarga."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "K4",
+      "Variabel": "Sinkronisasi Ekosistem Literasi",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "K4.1",
+          "Indikator": "Partisipasi dalam Program Sekolah",
+          "Deskripsi": "Keaktifan orang tua dalam program literasi sekolah (menghadiri parenting literasi, donasi buku, volunteer)",
+          "Tipe_Skala": "Tipe 2: Frekuensi + Kualitas",
+          "Skala_Scoring": {
+            "1": "Tidak pernah terlibat",
+            "2": "Pernah terlibat tapi sangat jarang (1x per tahun)",
+            "3": "Cukup aktif (2-3x per tahun)",
+            "4": "Sangat aktif (rutin mengikuti kegiatan sekolah)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan frekuensi keterlibatan orang tua dalam kegiatan literasi di sekolah: menghadiri seminar/workshop literasi untuk orang tua, menjadi relawan membacakan cerita di kelas, menyumbang buku untuk perpustakaan sekolah, atau membantu event literasi sekolah (book fair, lomba menulis). Nilai konsistensi dan kualitas keterlibatan (hanya hadir atau benar-benar berkontribusi aktif)."
+        },
+        {
+          "Kode": "K4.2",
+          "Indikator": "Sinkronisasi Kegiatan Rumah-Sekolah",
+          "Deskripsi": "Keluarga menyelaraskan aktivitas literasi di rumah dengan program sekolah (mendukung tugas baca, membahas pelajaran)",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak ada sinkronisasi (tidak tahu program sekolah)",
+            "2": "Jarang (hanya saat ada tugas/ujian)",
+            "3": "Sering (rutin bertanya dan mendukung)",
+            "4": "Sangat sering (proaktif mengintegrasikan dengan aktivitas rumah)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan apakah orang tua mengetahui program literasi sekolah dan mengikuti perkembangannya (membaca buku komunikasi, mengecek tugas literasi anak). Amati apakah orang tua mendukung tugas membaca dari sekolah, membahas buku yang dibaca anak di sekolah, atau bahkan proaktif memberikan bacaan tambahan yang selaras dengan tema pembelajaran. Nilai komunikasi orang tua-sekolah terkait perkembangan literasi anak."
+        },
+        {
+          "Kode": "K4.3",
+          "Indikator": "Keterlibatan dalam Literasi Masyarakat",
+          "Deskripsi": "Keluarga aktif berpartisipasi dalam kegiatan literasi di lingkungan masyarakat (TBM, komunitas baca, perpustakaan desa)",
+          "Tipe_Skala": "Tipe 2: Frekuensi",
+          "Skala_Scoring": {
+            "1": "Tidak pernah terlibat",
+            "2": "Jarang (1-2x per tahun)",
+            "3": "Cukup sering (1x per bulan)",
+            "4": "Sangat sering (2+ kali per bulan, bahkan menjadi penggiat)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Identifikasi keterlibatan keluarga dalam kegiatan literasi masyarakat: mengunjungi TBM/perpustakaan desa, mengikuti program dongeng/bedah buku di komunitas, atau bahkan menjadi relawan di komunitas literasi setempat. Tanyakan apakah keluarga memanfaatkan fasilitas literasi publik (meminjam buku di perpustakaan umum, menghadiri acara literasi di balai desa). Nilai konsistensi dan tingkat keterlibatan (hanya sebagai peserta atau juga kontributor)."
+        }
+      ]
+    },
+    {
+      "Kode_Variabel": "K5",
+      "Variabel": "Dampak pada Perkembangan Anak",
+      "Bobot_Variabel": 0.15,
+      "Indikator": [
+        {
+          "Kode": "K5.1",
+          "Indikator": "Perkembangan Karakter Anak",
+          "Deskripsi": "Dampak kegiatan literasi pada pembentukan karakter positif anak (rasa ingin tahu, empati, kejujuran, tanggung jawab)",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak terlihat dampak pada karakter",
+            "2": "Ada sedikit dampak pada 1 aspek karakter",
+            "3": "Ada dampak pada 2-3 aspek karakter",
+            "4": "Ada dampak signifikan pada 4+ aspek karakter"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan persepsi orang tua tentang perubahan karakter anak sejak rutin melakukan kegiatan literasi keluarga. Amati apakah anak menunjukkan: rasa ingin tahu yang meningkat (sering bertanya, mencari tahu), empati (memahami perasaan tokoh cerita/orang lain), kejujuran (berani bercerita jujur), atau tanggung jawab (menyelesaikan bacaan, merawat buku). Nilai apakah ini hanya kesan subjektif atau benar-benar terlihat perubahan nyata."
+        },
+        {
+          "Kode": "K5.2",
+          "Indikator": "Kualitas Hubungan Orang Tua-Anak",
+          "Deskripsi": "Dampak aktivitas literasi bersama terhadap kedekatan emosional, komunikasi, dan quality time orang tua-anak",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada perubahan hubungan",
+            "2": "Ada sedikit peningkatan kedekatan",
+            "3": "Ada peningkatan cukup signifikan (lebih dekat, komunikasi lebih baik)",
+            "4": "Ada peningkatan sangat signifikan (bonding kuat, komunikasi terbuka)"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan apakah kegiatan literasi bersama (membaca cerita bersama, diskusi buku) memperbaiki hubungan orang tua-anak. Amati perubahan: apakah anak lebih terbuka bercerita, orang tua lebih memahami minat/karakter anak, atau quality time bersama meningkat. Nilai apakah aktivitas literasi menjadi momen bonding yang bermakna atau hanya formalitas. Perhatikan testimoni konkret seperti 'anak jadi lebih dekat dengan ayah sejak rutin dibacakan cerita'."
+        },
+        {
+          "Kode": "K5.3",
+          "Indikator": "Kemampuan Literasi & Prestasi Anak",
+          "Deskripsi": "Dampak pada peningkatan kemampuan literasi anak (membaca lancar, menulis, berhitung) dan prestasi di sekolah",
+          "Tipe_Skala": "Tipe 4: Persepsi Dampak",
+          "Skala_Scoring": {
+            "1": "Tidak ada peningkatan kemampuan/prestasi",
+            "2": "Ada sedikit peningkatan kemampuan saja",
+            "3": "Ada peningkatan kemampuan dan nilai sekolah",
+            "4": "Ada peningkatan signifikan kemampuan + prestasi akademik/non-akademik"
+          },
+          "Bobot": 0.05,
+          "Observasi": "Tanyakan perkembangan kemampuan literasi anak yang dirasakan orang tua: apakah anak membaca lebih lancar, kosakata bertambah, lebih suka menulis, atau lebih cepat memahami soal matematika. Bandingkan dengan prestasi di sekolah: apakah nilai rapor meningkat, ranking naik, atau ada prestasi lomba (menulis, cerdas cermat). Nilai apakah orang tua melihat korelasi antara kegiatan literasi keluarga dengan perkembangan ini."
+        }
+      ]
+    }
+  ]
+}
