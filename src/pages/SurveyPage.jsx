@@ -1,5 +1,5 @@
 // src/pages/SurveyPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import QuestionStep from '../components/survey/QuestionStep';
 import { SURVEY_QUESTIONS } from '../utils/constants';
 import { submitSurvey } from '../services/googleSheets';
