@@ -90,12 +90,19 @@ export async function submitSurvey(formData) {
     const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
     
     if (SCRIPT_URL) {
-      await axios.post(SCRIPT_URL, JSON.stringify({
-        sheetName: 'responses',
-        values: rowData
-      }), {
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-      });
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Penting untuk bypass CORS Apps Script
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            sheetName: 'responses',
+            values: rowData
+          })
+        });
+      } catch (e) {
+        console.warn('Apps Script submission warning:', e);
+      }
     }
     
     // Calculate Score (Hanya yang relevan dengan lingkup saat ini)
@@ -115,19 +122,26 @@ export async function submitSurvey(formData) {
     
     // Submit to Apps Script Proxy (calculated_scores sheet)
     if (SCRIPT_URL) {
-      await axios.post(SCRIPT_URL, JSON.stringify({
-        sheetName: 'calculated_scores',
-        values: [
-          userId,
-          formData.lingkup,
-          (weightedScore * 100).toFixed(2),
-          weightedScore.toFixed(2),
-          category,
-          timestamp
-        ]
-      }), {
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-      });
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            sheetName: 'calculated_scores',
+            values: [
+              userId,
+              formData.lingkup,
+              (weightedScore * 100).toFixed(2),
+              weightedScore.toFixed(2),
+              category,
+              timestamp
+            ]
+          })
+        });
+      } catch (e) {
+        console.warn('Apps Script submission warning:', e);
+      }
     }
     
     return {
