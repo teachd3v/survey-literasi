@@ -44,17 +44,25 @@ export default function DashboardPage() {
         <div className="absolute -bottom-20 left-40 w-96 h-96 bg-[#2e66a3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 bg-gradient-to-r from-white via-[#7dcbe1] to-[#39a0c9] bg-clip-text text-transparent">
-            Dashboard Ekosistem Literasi
-          </h1>
-          <p className="text-white/70 text-lg">Monitor dan analisis data literasi secara real-time</p>
+      <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto">
+        {/* Header & Navigation */}
+        <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <button 
+              onClick={() => window.location.href = '/survey'}
+              className="text-brand-light flex items-center gap-2 mb-4 hover:underline text-sm font-bold"
+            >
+              ← Kembali ke Survey
+            </button>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-3 bg-gradient-to-r from-white via-brand-cyan to-brand-light bg-clip-text text-transparent leading-tight">
+              Dashboard Ekosistem Literasi
+            </h1>
+            <p className="text-white/70 text-base md:text-lg">Analisis data literasi secara real-time</p>
+          </div>
         </div>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
           <StatCard 
             title="Total Responden" 
             value={stats?.totalResponses || 0} 
@@ -73,7 +81,6 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             }
-            trend={{ positive: true, value: '+12%', label: 'vs bulan lalu' }}
           />
           <StatCard 
             title="Update Terakhir" 
@@ -88,7 +95,7 @@ export default function DashboardPage() {
           <StatCard 
             title="Target Responden" 
             value="240" 
-            subtitle="Sekolah, Keluarga, Masyarakat"
+            subtitle="Capaian saat ini"
             icon={
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -98,26 +105,28 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 mb-12">
           <LingkupComparison data={stats?.lingkupStats || []} />
           
           <div className="space-y-6">
-            {/* Lingkup Selector for Radar */}
-            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-2 border border-white/20 flex gap-2">
-              {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setSelectedLingkup(l)}
-                  className={`
-                    flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all
-                    ${selectedLingkup === l 
-                      ? 'bg-gradient-to-r from-brand-cyan to-brand-light text-white shadow-lg' 
-                      : 'text-white/60 hover:bg-white/5 hover:text-white'}
-                  `}
-                >
-                  {l}
-                </button>
-              ))}
+            {/* Lingkup Selector for Radar (Scrollable on mobile) */}
+            <div className="overflow-x-auto pb-2 custom-scrollbar">
+              <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-1.5 border border-white/20 flex gap-2 min-w-[320px]">
+                {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setSelectedLingkup(l)}
+                    className={`
+                      flex-1 py-2 px-4 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap
+                      ${selectedLingkup === l 
+                        ? 'bg-gradient-to-r from-brand-cyan to-brand-light text-white shadow-lg' 
+                        : 'text-white/60 hover:bg-white/5 hover:text-white'}
+                    `}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
             </div>
             
             <IndicatorRadar data={indicatorData} lingkup={selectedLingkup} />
