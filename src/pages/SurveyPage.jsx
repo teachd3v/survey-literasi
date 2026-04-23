@@ -9,7 +9,6 @@ export default function SurveyPage() {
   const [lingkup, setLingkup] = useState(null);
   const [identity, setIdentity] = useState({ 
     responden_nama: '', 
-    email: '', 
     wilayah: '' 
   });
   const [answers, setAnswers] = useState({});
@@ -144,32 +143,25 @@ export default function SurveyPage() {
           <h2 className="text-3xl font-bold text-white mb-6">Data Diri</h2>
           <form onSubmit={handleIdentitySubmit} className="space-y-6">
             <div>
-              <label className="block text-white/70 text-sm mb-2">Nama Lengkap</label>
+              <label className="block text-white/50 font-black uppercase tracking-widest text-[10px] mb-2">Nama Lengkap</label>
               <input
                 required
                 type="text"
-                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-cyan"
+                placeholder="CONTOH: BUDI SANTOSO"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-cyan transition-all uppercase placeholder:text-white/20"
                 value={identity.responden_nama}
-                onChange={e => setIdentity({...identity, responden_nama: e.target.value})}
+                onChange={e => setIdentity({...identity, responden_nama: e.target.value.toUpperCase()})}
               />
             </div>
             <div>
-              <label className="block text-white/70 text-sm mb-2">Email (Opsional)</label>
-              <input
-                type="email"
-                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-cyan"
-                value={identity.email}
-                onChange={e => setIdentity({...identity, email: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-white/70 text-sm mb-2">Wilayah / Kota</label>
+              <label className="block text-white/50 font-black uppercase tracking-widest text-[10px] mb-2">Wilayah / Kota</label>
               <input
                 required
                 type="text"
-                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-cyan"
+                placeholder="CONTOH: JAKARTA SELATAN"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-cyan transition-all uppercase placeholder:text-white/20"
                 value={identity.wilayah}
-                onChange={e => setIdentity({...identity, wilayah: e.target.value})}
+                onChange={e => setIdentity({...identity, wilayah: e.target.value.toUpperCase()})}
               />
             </div>
             <button
