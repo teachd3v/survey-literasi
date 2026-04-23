@@ -104,10 +104,10 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Chart Section */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Main Chart Section - Top Row Left */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50 h-full">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian per Lingkup</h3>
@@ -116,49 +116,22 @@ export default function DashboardPage() {
               </div>
               <LingkupComparison data={stats?.lingkupStats || []} />
             </div>
-
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-                <div>
-                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Detail Indikator</h3>
-                  <p className="text-slate-400 text-sm font-medium">Breakdown skor per indikator strategis</p>
-                </div>
-                {/* Custom Tabs */}
-                <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-                  {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map(l => (
-                    <button
-                      key={l}
-                      onClick={() => setActiveLingkup(l)}
-                      className={`
-                        px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
-                        ${activeLingkup === l 
-                          ? 'bg-white text-sky-600 shadow-lg shadow-slate-200 scale-105 z-10' 
-                          : 'text-slate-400 hover:text-slate-600'}
-                      `}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <IndicatorRadar lingkup={activeLingkup} />
-            </div>
           </div>
 
-          {/* Sidebar Section */}
-          <div className="space-y-8">
-            <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl">
-              <h4 className="text-xl font-black mb-6 uppercase tracking-widest text-[#7dcbe1]">Interpretasi Kualitatif</h4>
-              <div className="space-y-6">
+          {/* Sidebar Section - Top Row Right */}
+          <div className="space-y-6">
+            <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl h-[calc(50%-12px)] overflow-hidden">
+              <h4 className="text-xl font-black mb-6 uppercase tracking-widest text-[#7dcbe1]">Interpretasi</h4>
+              <div className="space-y-4">
                 {stats?.categoryDistribution && Object.entries(stats.categoryDistribution).map(([cat, count]) => (
-                  <div key={cat} className="flex justify-between items-center group">
+                  <div key={cat} className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${
                         cat === 'Sangat Baik' ? 'bg-emerald-400' :
                         cat === 'Baik' ? 'bg-sky-400' :
                         cat === 'Berkembang' ? 'bg-amber-400' : 'bg-red-400'
                       }`}></div>
-                      <span className="text-slate-200 font-bold text-sm group-hover:text-white transition-colors">{cat}</span>
+                      <span className="text-slate-200 font-bold text-sm">{cat}</span>
                     </div>
                     <span className="font-black text-lg">{count}</span>
                   </div>
@@ -166,21 +139,45 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl h-[calc(50%-12px)] relative overflow-hidden group">
               <div className="relative z-10">
-                <h4 className="text-xl font-black mb-2 uppercase tracking-widest">Target Capaian</h4>
-                <p className="text-sky-100 text-sm mb-6 leading-relaxed">Persentase data masuk dibandingkan target kuota responden.</p>
+                <h4 className="text-xl font-black mb-1 uppercase tracking-widest">Target</h4>
                 <div className="text-5xl font-black mb-2">18.7%</div>
                 <div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden">
                    <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: '18.7%' }}></div>
                 </div>
-                <p className="text-sky-100 font-bold text-xs uppercase tracking-widest">240 dari 1,280 Sampel</p>
+                <p className="text-sky-100 font-bold text-[10px] uppercase tracking-widest">240 dari 1,280 Sampel</p>
               </div>
-              <svg className="absolute -bottom-4 -right-10 w-48 h-48 text-sky-500 opacity-20 transform rotate-12 group-hover:scale-110 transition-all duration-700" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z" />
-              </svg>
             </div>
           </div>
+        </div>
+
+        {/* Detail Indikator - Full Width Bottom Row */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Analisis Detail Indikator</h3>
+              <p className="text-slate-400 text-sm font-medium">Breakdown skor per butir indikator strategis (15 Poin)</p>
+            </div>
+            {/* Custom Tabs */}
+            <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+              {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map(l => (
+                <button
+                  key={l}
+                  onClick={() => setActiveLingkup(l)}
+                  className={`
+                    px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
+                    ${activeLingkup === l 
+                      ? 'bg-white text-sky-600 shadow-lg shadow-slate-200 scale-105 z-10' 
+                      : 'text-slate-400 hover:text-slate-600'}
+                  `}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+          <IndicatorRadar lingkup={activeLingkup} />
         </div>
       </div>
     </div>

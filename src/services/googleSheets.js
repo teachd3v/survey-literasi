@@ -89,11 +89,14 @@ export async function submitSurvey(formData) {
     // Submit to Apps Script Proxy (responses sheet)
     const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
     
+    console.log('DEBUG: Mengirim ke Apps Script URL:', SCRIPT_URL);
+    console.log('DEBUG: Data Responses Row:', rowData);
+
     if (SCRIPT_URL) {
       try {
         await fetch(SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors', // Penting untuk bypass CORS Apps Script
+          mode: 'no-cors',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             sheetName: 'responses',
@@ -101,7 +104,7 @@ export async function submitSurvey(formData) {
           })
         });
       } catch (e) {
-        console.warn('Apps Script submission warning:', e);
+        console.error('DEBUG: Apps Script Error (responses):', e);
       }
     }
     
@@ -120,6 +123,8 @@ export async function submitSurvey(formData) {
     const weightedScore = calculateWeightedScore(currentScores, formData.lingkup);
     const category = getCategory(weightedScore);
     
+    console.log('DEBUG: Data Calculated values:', [userId, formData.lingkup, weightedScore.toFixed(2), category]);
+
     // Submit to Apps Script Proxy (calculated_scores sheet)
     if (SCRIPT_URL) {
       try {
@@ -140,7 +145,7 @@ export async function submitSurvey(formData) {
           })
         });
       } catch (e) {
-        console.warn('Apps Script submission warning:', e);
+        console.error('DEBUG: Apps Script Error (calculated):', e);
       }
     }
     
@@ -246,7 +251,7 @@ export async function fetchIndicatorBreakdown(lingkup) {
   try {
     // Fetch raw responses
     const response = await axios.get(
-      `${BASE_URL}/${SPREADSHEET_ID}/values/responses!A:Z`,
+      `${BASE_URL}/${SPREADSHEET_ID}/values/responses!A:AZ`,
       {
         params: { key: API_KEY }
       }
@@ -258,32 +263,45 @@ export async function fetchIndicatorBreakdown(lingkup) {
     // Skip header, filter by lingkup
     const data = rows.slice(1).filter(row => row[2] === lingkup);
     
-    // Column indices for indicators
-    const indicatorIndices = {
-      SEKOLAH: { S1: 6, S2: 7, S3: 8, S4: 9, S5: 10 },
-      KELUARGA: { K1: 11, K2: 12, K3: 13, K4: 14, K5: 15 },
-      MASYARAKAT: { M1: 16, M2: 17, M3: 18, M4: 19, M5: 20 }
-    };
+    // Tentukan offset kolom berdasarkan lingkup
+    let startCol = 5; // Default Sekolah (S1.1)
+    let prefix = 'S';
     
-    const indices = indicatorIndices[lingkup];
+    if (lingkup === 'KELUARGA') {
+      startCol = 20; // K1.1
+      prefix = 'K';
+    } else if (lingkup === 'MASYARAKAT') {
+      startCol = 35; // M1.1
+      prefix = 'M';
+    }
+
+    // Ambil data untuk semua 15 indikator (5 variabel x 3 indikator)
     const breakdown = [];
-    
-    Object.keys(indices).forEach(key => {
-      const idx = indices[key];
-      const scores = data
-        .map(row => parseFloat(row[idx]))
-        .filter(s => !isNaN(s) && s > 0);
-      
-      const avg = scores.length > 0
-        ? scores.reduce((a, b) => a + b, 0) / scores.length
-        : 0;
-      
-      breakdown.push({
-        indicator: key,
-        value: avg,
-        fullMark: 4
-      });
-    });
+    for (let v = 1; v <= 5; v++) {
+      for (let i = 1; i <= 3; i++) {
+        const colIdx = startCol + ((v - 1) * 3) + (i - 1);
+        const indicatorCode = `${prefix}${v}.${i}`;
+        
+        let total = 0;
+        let count = 0;
+        
+        rows.slice(1).forEach(row => {
+          if (row[2] === lingkup) {
+            const val = parseFloat(row[colIdx]);
+            if (!isNaN(val) && val > 0) {
+              total += val;
+              count++;
+            }
+          }
+        });
+        
+        breakdown.push({
+          indicator: indicatorCode,
+          value: count > 0 ? total / count : 0,
+          fullMark: 4
+        });
+      }
+    }
     
     return breakdown;
     
