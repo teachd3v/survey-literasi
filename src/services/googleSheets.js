@@ -90,6 +90,7 @@ export async function submitSurvey(formData) {
       userId,
       formData.lingkup,
       formData.responden_nama,
+      formData.email || '',
       formData.wilayah || '',
       ...scoresArray
     ];
