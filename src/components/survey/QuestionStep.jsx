@@ -100,24 +100,39 @@ export default function QuestionStep({
             {/* Header Content */}
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
               <div className="flex-1">
-                {/* Question Kode Badge */}
-                <div className="inline-flex items-center backdrop-blur-xl bg-gradient-to-r from-[#39a0c9]/30 to-[#7dcbe1]/30 border border-white/30 px-3 py-1 rounded-full mb-4 shadow-lg">
-                  <span className="text-white font-bold text-xs tracking-wider">{question.kode}</span>
+                {/* Context & ID Badge */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="backdrop-blur-xl bg-brand-cyan/20 border border-brand-cyan/30 px-3 py-1 rounded-lg">
+                    <span className="text-brand-cyan font-black text-[10px] tracking-widest">{question.kode}</span>
+                  </div>
+                  <div className="h-4 w-[1px] bg-white/10"></div>
+                  <span className="text-white/40 font-black text-[10px] uppercase tracking-[0.2em]">
+                    Variabel: {question.variabel}
+                  </span>
                 </div>
                 
-                {/* Variabel Name */}
-                <h2 className="text-sm md:text-base font-black text-[#7dcbe1] uppercase tracking-widest mb-2 opacity-80">
-                  {question.variabel}
-                </h2>
-                
-                {/* Question Text */}
-                <h4 className="text-xl md:text-3xl font-extrabold text-white leading-tight mb-4">
+                {/* Indicator Title (The main question focus) */}
+                <h4 className="text-2xl md:text-4xl font-extrabold text-white leading-tight mb-6">
                   {question.indikator}
                 </h4>
                 
-                <p className="text-white/70 text-sm md:text-lg italic leading-relaxed">
-                  "{question.deskripsi}"
-                </p>
+                {/* Ideal Standard Box - Benchmark for Score 4 */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/50 to-brand-cyan/50 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                  <div className="relative p-5 md:p-6 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                        <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <h5 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.2em]">Kondisi Ideal (Skor 4):</h5>
+                    </div>
+                    <p className="text-white/80 text-sm md:text-lg italic leading-relaxed font-medium">
+                      "{question.deskripsi}"
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -127,14 +142,14 @@ export default function QuestionStep({
                     type="button"
                     onClick={() => setShowObservation(!showObservation)}
                     className={`
-                      flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-xs font-bold transition-all border
+                      flex items-center justify-center gap-2 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border
                       ${showObservation 
-                        ? 'bg-[#39a0c9] text-white border-[#39a0c9] shadow-[0_0_20px_rgba(57,160,201,0.5)]' 
-                        : 'bg-white/5 text-[#7dcbe1] border-white/10 hover:bg-white/10'}
+                        ? 'bg-brand-cyan text-white border-brand-cyan shadow-[0_0_30px_rgba(57,160,201,0.4)]' 
+                        : 'bg-white/5 text-brand-cyan border-white/10 hover:bg-white/10'}
                     `}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     {showObservation ? 'Sembunyikan Tips' : 'Petunjuk Observasi'}
                   </button>
