@@ -84,7 +84,7 @@ export async function submitSurvey(formData) {
       scoresArray[14] = formData.M5;
     }
     
-    // Row data for 'responses' sheet
+    // Raw data for 'responses' sheet
     const rowData = [
       timestamp,
       userId,
@@ -95,20 +95,19 @@ export async function submitSurvey(formData) {
       ...scoresArray
     ];
     
-    // Append to 'responses' sheet
-    const response = await axios.post(
-      `${BASE_URL}/${SPREADSHEET_ID}/values/responses!A:Z:append`,
-      {
-        values: [rowData],
-        range: 'responses!A:Z'
-      },
-      {
-        params: {
-          key: API_KEY,
-          valueInputOption: 'USER_ENTERED'
-        }
-      }
-    );
+    // Submit to Apps Script Proxy (responses sheet)
+    const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+    
+    if (!SCRIPT_URL) {
+      console.warn('VITE_GOOGLE_SCRIPT_URL is not set. Data will not be saved to spreadsheet.');
+    } else {
+      await axios.post(SCRIPT_URL, JSON.stringify({
+        sheetName: 'responses',
+        values: rowData
+      }), {
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+      });
+    }
     
     // Calculate score
     const scores = {};
@@ -135,27 +134,22 @@ export async function submitSurvey(formData) {
     const weightedScore = calculateWeightedScore(scores, formData.lingkup);
     const category = getCategory(weightedScore);
     
-    // Append to 'calculated_scores' sheet
-    await axios.post(
-      `${BASE_URL}/${SPREADSHEET_ID}/values/calculated_scores!A:Z:append`,
-      {
-        values: [[
+    // Submit to Apps Script Proxy (calculated_scores sheet)
+    if (SCRIPT_URL) {
+      await axios.post(SCRIPT_URL, JSON.stringify({
+        sheetName: 'calculated_scores',
+        values: [
           userId,
           formData.lingkup,
           (weightedScore * 100).toFixed(2),
           weightedScore.toFixed(2),
           category,
           timestamp
-        ]],
-        range: 'calculated_scores!A:Z'
-      },
-      {
-        params: {
-          key: API_KEY,
-          valueInputOption: 'USER_ENTERED'
-        }
-      }
-    );
+        ]
+      }), {
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+      });
+    }
     
     return {
       success: true,
