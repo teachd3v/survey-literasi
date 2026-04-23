@@ -1,141 +1,184 @@
 // src/pages/DashboardPage.jsx
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import StatCard from '../components/dashboard/StatCard';
 import LingkupComparison from '../components/dashboard/LingkupComparison';
 import IndicatorRadar from '../components/dashboard/IndicatorRadar';
-import { fetchDashboardStats, fetchIndicatorBreakdown } from '../services/googleSheets';
+import { fetchDashboardStats } from '../services/googleSheets';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
+  const [activeLingkup, setActiveLingkup] = useState('SEKOLAH');
   const [loading, setLoading] = useState(true);
-  const [selectedLingkup, setSelectedLingkup] = useState('SEKOLAH');
-  const [indicatorData, setIndicatorData] = useState([]);
+
+  const loadData = async () => {
+    try {
+      const dashboardData = await fetchDashboardStats();
+      setStats(dashboardData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await fetchDashboardStats();
-        setStats(data);
-        const breakdown = await fetchIndicatorBreakdown(selectedLingkup);
-        setIndicatorData(breakdown);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
-  }, [selectedLingkup]);
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-navy flex items-center justify-center">
-        <div className="text-white text-2xl animate-pulse">Loading data...</div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+          <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Memuat Analisis...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-brand-navy">
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#2a3e63] via-[#2e66a3] to-[#39a0c9]">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-[#7dcbe1] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-[#39a0c9] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-20 left-40 w-96 h-96 bg-[#2e66a3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      {/* Floating Back Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <Link 
+          to="/survey"
+          className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-105 active:scale-95 transition-all"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Kembali ke Survey
+        </Link>
       </div>
 
-      <div className="relative z-10 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto h-screen flex flex-col">
-        {/* Header - Compact Version */}
-        <div className="mb-4 md:mb-6 flex flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <button 
-              onClick={() => window.location.href = '/survey'}
-              className="group flex items-center gap-2 text-brand-light hover:text-white transition-colors"
-            >
-              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-brand-cyan/20">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </div>
-              <span className="text-xs font-black uppercase tracking-widest hidden md:block">Back to Survey</span>
-            </button>
-            
-            <div className="h-10 w-[1px] bg-white/10 hidden md:block"></div>
-
-            <div>
-              <h1 className="text-xl md:text-3xl font-black text-white bg-gradient-to-r from-white via-brand-cyan to-brand-light bg-clip-text text-transparent leading-none">
-                INSTRUMEN EKOSISTEM LITERASI
-              </h1>
-              <p className="text-white/50 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mt-1">Real-time Performance Analytics</p>
+      <div className="max-w-7xl mx-auto px-6 pt-12">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-100 rounded-lg mb-4">
+              <div className="w-2 h-2 bg-sky-600 rounded-full animate-pulse"></div>
+              <span className="text-sky-700 font-black text-[10px] uppercase tracking-widest">Real-time Analytics</span>
             </div>
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">
+              Dashboard Literasi
+            </h1>
+            <p className="text-slate-500 font-medium text-lg">
+              Visualisasi pemetaan ekosistem literasi nasional 2026.
+            </p>
           </div>
-
-          <div className="hidden lg:flex items-center gap-4 text-white/40 text-[10px] font-black uppercase tracking-widest">
-            <span>Status: <span className="text-emerald-400">Live</span></span>
-            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+          <div className="flex flex-col items-end">
+            <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">Terakhir Update</span>
+            <span className="text-slate-900 font-bold">{new Date().toLocaleString('id-ID')}</span>
           </div>
         </div>
 
-        {/* Overview Stats - More Compact */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4 md:mb-6">
+        {/* Big Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <StatCard 
             title="Total Responden" 
-            value={stats?.totalResponses || 0} 
-            compact
-            icon={<path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />}
+            value={stats?.totalResponses || 0}
+            icon="users"
+            subtitle="Sampel data masuk"
           />
           <StatCard 
             title="Indeks Nasional" 
-            value={stats?.avgScore?.toFixed(2) || '0.00'} 
-            subtitle="Skala 4.0"
-            compact
-            icon={<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />}
+            value={stats?.avgScore?.toFixed(2) || '0.00'}
+            icon="chart"
+            subtitle="Skala 4.00"
+            color="sky"
           />
           <StatCard 
-            title="Sync Status" 
-            value="Active" 
-            subtitle={new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-            compact
-            icon={<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
+            title="Kategori Dominan" 
+            value={stats?.categoryDistribution ? Object.entries(stats.categoryDistribution).sort((a,b) => b[1]-a[1])[0][0] : '-'}
+            icon="award"
+            subtitle="Berdasarkan sebaran"
+            color="emerald"
           />
           <StatCard 
-            title="Target Capaian" 
-            value="18.7%" 
-            subtitle="240 Sample"
-            compact
-            icon={<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />}
+            title="Status Sistem" 
+            value="Sinkron"
+            icon="check"
+            subtitle="Cloud Connected"
+            color="slate"
           />
         </div>
 
-        {/* Charts Grid - Expanded to fill remaining space */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 md:gap-6 flex-1 min-h-0">
-          <div className="xl:col-span-12 lg:col-span-5 h-full overflow-hidden">
-             <LingkupComparison data={stats?.lingkupStats || []} horizontal />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Chart Section */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian per Lingkup</h3>
+                  <p className="text-slate-400 text-sm font-medium">Bandingkan performa antar ekosistem</p>
+                </div>
+              </div>
+              <LingkupComparison data={stats?.lingkupStats || []} />
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Detail Indikator</h3>
+                  <p className="text-slate-400 text-sm font-medium">Breakdown skor per indikator strategis</p>
+                </div>
+                {/* Custom Tabs */}
+                <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                  {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map(l => (
+                    <button
+                      key={l}
+                      onClick={() => setActiveLingkup(l)}
+                      className={`
+                        px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
+                        ${activeLingkup === l 
+                          ? 'bg-white text-sky-600 shadow-lg shadow-slate-200 scale-105 z-10' 
+                          : 'text-slate-400 hover:text-slate-600'}
+                      `}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <IndicatorRadar lingkup={activeLingkup} />
+            </div>
           </div>
-          
-          <div className="xl:col-span-12 lg:col-span-7 flex flex-col gap-4 min-h-0">
-            {/* Lingkup Selector for Radar */}
-            <div className="overflow-x-auto custom-scrollbar shrink-0">
-              <div className="backdrop-blur-xl bg-white/5 rounded-2xl p-1 border border-white/10 flex gap-1">
-                {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => setSelectedLingkup(l)}
-                    className={`
-                      flex-1 py-1.5 px-3 rounded-xl text-[10px] md:text-xs font-black transition-all uppercase tracking-widest
-                      ${selectedLingkup === l 
-                        ? 'bg-white text-brand-navy shadow-lg' 
-                        : 'text-white/40 hover:bg-white/5 hover:text-white/80'}
-                    `}
-                  >
-                    {l}
-                  </button>
+
+          {/* Sidebar Section */}
+          <div className="space-y-8">
+            <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl">
+              <h4 className="text-xl font-black mb-6 uppercase tracking-widest text-[#7dcbe1]">Interpretasi Kualitatif</h4>
+              <div className="space-y-6">
+                {stats?.categoryDistribution && Object.entries(stats.categoryDistribution).map(([cat, count]) => (
+                  <div key={cat} className="flex justify-between items-center group">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${
+                        cat === 'Sangat Baik' ? 'bg-emerald-400' :
+                        cat === 'Baik' ? 'bg-sky-400' :
+                        cat === 'Berkembang' ? 'bg-amber-400' : 'bg-red-400'
+                      }`}></div>
+                      <span className="text-slate-200 font-bold text-sm group-hover:text-white transition-colors">{cat}</span>
+                    </div>
+                    <span className="font-black text-lg">{count}</span>
+                  </div>
                 ))}
               </div>
             </div>
-            
-            <div className="flex-1 min-h-0">
-              <IndicatorRadar data={indicatorData} lingkup={selectedLingkup} compact />
+
+            <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <h4 className="text-xl font-black mb-2 uppercase tracking-widest">Target Capaian</h4>
+                <p className="text-sky-100 text-sm mb-6 leading-relaxed">Persentase data masuk dibandingkan target kuota responden.</p>
+                <div className="text-5xl font-black mb-2">18.7%</div>
+                <div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden">
+                   <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: '18.7%' }}></div>
+                </div>
+                <p className="text-sky-100 font-bold text-xs uppercase tracking-widest">240 dari 1,280 Sampel</p>
+              </div>
+              <svg className="absolute -bottom-4 -right-10 w-48 h-48 text-sky-500 opacity-20 transform rotate-12 group-hover:scale-110 transition-all duration-700" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z" />
+              </svg>
             </div>
           </div>
         </div>

@@ -60,31 +60,22 @@ export async function submitSurvey(formData) {
     const userId = generateUserId();
     const timestamp = new Date().toISOString();
     
-    // Prepare scores array (15 columns: S1-S5, K1-K5, M1-M5)
-    const scoresArray = Array(15).fill(null);
+    // Dinamis: Ambil semua kode pertanyaan yang ada di answers (S1.1, K1.1, dsb)
+    // Kita buat urutan kolom yang pasti: S1.1-S1.5, K1.1-K1.5, M1.1-M1.5 (Total 15 kolom)
+    const getScoresArray = () => {
+      const result = [];
+      ['S', 'K', 'M'].forEach(prefix => {
+        for (let i = 1; i <= 5; i++) {
+          const key = `${prefix}1.${i}`; // Format kode di JSON: S1.1, S1.2, dst
+          result.push(formData[key] || null);
+        }
+      });
+      return result;
+    };
+
+    const scoresArray = getScoresArray();
     
-    // Fill scores based on lingkup
-    if (formData.lingkup === 'SEKOLAH') {
-      scoresArray[0] = formData.S1;
-      scoresArray[1] = formData.S2;
-      scoresArray[2] = formData.S3;
-      scoresArray[3] = formData.S4;
-      scoresArray[4] = formData.S5;
-    } else if (formData.lingkup === 'KELUARGA') {
-      scoresArray[5] = formData.K1;
-      scoresArray[6] = formData.K2;
-      scoresArray[7] = formData.K3;
-      scoresArray[8] = formData.K4;
-      scoresArray[9] = formData.K5;
-    } else if (formData.lingkup === 'MASYARAKAT') {
-      scoresArray[10] = formData.M1;
-      scoresArray[11] = formData.M2;
-      scoresArray[12] = formData.M3;
-      scoresArray[13] = formData.M4;
-      scoresArray[14] = formData.M5;
-    }
-    
-    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, S1-S5, K1-K5, M1-M5)
+    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, 15 Skor)
     const rowData = [
       timestamp,
       userId,
@@ -97,9 +88,7 @@ export async function submitSurvey(formData) {
     // Submit to Apps Script Proxy (responses sheet)
     const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
     
-    if (!SCRIPT_URL) {
-      console.warn('VITE_GOOGLE_SCRIPT_URL is not set. Data will not be saved to spreadsheet.');
-    } else {
+    if (SCRIPT_URL) {
       await axios.post(SCRIPT_URL, JSON.stringify({
         sheetName: 'responses',
         values: rowData
@@ -108,29 +97,15 @@ export async function submitSurvey(formData) {
       });
     }
     
-    // Calculate score
-    const scores = {};
-    if (formData.lingkup === 'SEKOLAH') {
-      scores.S1 = formData.S1;
-      scores.S2 = formData.S2;
-      scores.S3 = formData.S3;
-      scores.S4 = formData.S4;
-      scores.S5 = formData.S5;
-    } else if (formData.lingkup === 'KELUARGA') {
-      scores.K1 = formData.K1;
-      scores.K2 = formData.K2;
-      scores.K3 = formData.K3;
-      scores.K4 = formData.K4;
-      scores.K5 = formData.K5;
-    } else {
-      scores.M1 = formData.M1;
-      scores.M2 = formData.M2;
-      scores.M3 = formData.M3;
-      scores.M4 = formData.M4;
-      scores.M5 = formData.M5;
+    // Calculate Score (Hanya yang relevan dengan lingkup saat ini)
+    const currentScores = {};
+    const prefix = formData.lingkup === 'SEKOLAH' ? 'S' : formData.lingkup === 'KELUARGA' ? 'K' : 'M';
+    for (let i = 1; i <= 5; i++) {
+      const key = `${prefix}1.${i}`;
+      currentScores[key] = formData[key];
     }
     
-    const weightedScore = calculateWeightedScore(scores, formData.lingkup);
+    const weightedScore = calculateWeightedScore(currentScores, formData.lingkup);
     const category = getCategory(weightedScore);
     
     // Submit to Apps Script Proxy (calculated_scores sheet)

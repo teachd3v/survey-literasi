@@ -1,77 +1,68 @@
 // src/components/dashboard/IndicatorRadar.jsx
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { fetchIndicatorBreakdown } from '../../services/googleSheets';
 
-export default function IndicatorRadar({ data, lingkup, compact }) {
-  const colors = {
-    SEKOLAH: { stroke: '#2e66a3', fill: '#2e66a3' },
-    KELUARGA: { stroke: '#39a0c9', fill: '#39a0c9' },
-    MASYARAKAT: { stroke: '#7dcbe1', fill: '#7dcbe1' }
-  };
+export default function IndicatorRadar({ lingkup }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const color = colors[lingkup] || colors.SEKOLAH;
+  useEffect(() => {
+    async function loadBreakdown() {
+      setLoading(true);
+      try {
+        const breakdown = await fetchIndicatorBreakdown(lingkup);
+        setData(breakdown);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadBreakdown();
+  }, [lingkup]);
+
+  if (loading) return <div className="h-64 flex items-center justify-center text-slate-400 font-bold animate-pulse">Menghitung Indikator...</div>;
 
   return (
-    <div className="group relative h-full flex flex-col">
-      <div className={`absolute -inset-0.5 bg-gradient-to-r from-${color.stroke} to-${color.fill} rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-300`}></div>
-      
-      <div className={`
-        relative backdrop-blur-2xl bg-white/10 rounded-3xl border border-white/20 shadow-2xl flex-1 flex flex-col min-h-0
-        ${compact ? 'p-4' : 'p-8'}
-      `}>
-        <div className={compact ? 'mb-4' : 'mb-8'}>
-          <h2 className={`${compact ? 'text-lg' : 'text-3xl'} font-bold text-white mb-1 leading-tight uppercase`}>Analisis {lingkup}</h2>
-          <p className="text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">Detail skor per indikator</p>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="h-72 md:h-96">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+            <PolarGrid stroke="#e2e8f0" />
+            <PolarAngleAxis dataKey="indicator" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 900 }} />
+            <Radar
+              name="Skor"
+              dataKey="value"
+              stroke="#0284c7"
+              fill="#0ea5e9"
+              fillOpacity={0.5}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
 
-        <div className="flex-1 min-h-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 0, left: 30 }}>
-              <PolarGrid stroke="rgba(255,255,255,0.15)" />
-              <PolarAngleAxis 
-                dataKey="indicator" 
-                tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: compact ? 9 : 12, fontWeight: 700 }}
-              />
-              <PolarRadiusAxis 
-                angle={90} 
-                domain={[0, 4]} 
-                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 8 }}
-                stroke="rgba(255,255,255,0.1)"
-              />
-              <Radar 
-                name={lingkup}
-                dataKey="value" 
-                stroke={color.stroke} 
-                fill={color.fill} 
-                fillOpacity={0.4}
-                strokeWidth={3}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className={`
-          mt-4 backdrop-blur-xl bg-white/5 rounded-xl border border-white/10 overflow-hidden overflow-y-auto custom-scrollbar
-          ${compact ? 'max-h-[150px]' : 'max-h-[300px]'}
-        `}>
-          <table className="w-full text-[10px] md:text-xs">
-            <thead className="backdrop-blur-xl bg-white/10 border-b border-white/10 sticky top-0 z-10">
-              <tr>
-                <th className="px-3 py-2 text-left text-white/50 font-black uppercase tracking-widest">Indikator</th>
-                <th className="px-3 py-2 text-right text-white/50 font-black uppercase tracking-widest">Skor</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {data.map((item) => (
-                <tr key={item.indicator} className="hover:bg-white/5 transition-colors">
-                  <td className="px-3 py-2 font-bold text-white/90">{item.indicator}</td>
-                  <td className="px-3 py-2 text-right">
-                    <span className="font-black text-[#7dcbe1]">{item.value.toFixed(2)}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="space-y-3">
+        {data.map((item) => (
+          <div key={item.indicator} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group hover:bg-white hover:shadow-lg hover:border-sky-100 transition-all">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-black text-xs">{item.indicator}</span>
+                <span className="text-slate-900 font-black text-sm uppercase tracking-tight">Kualitas Capaian</span>
+              </div>
+              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Skor Rata-rata dari target 4.00</p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-black text-slate-900 leading-none">{item.value?.toFixed(2)}</div>
+              <div className={`text-[9px] font-black uppercase mt-1 ${
+                item.value >= 3.5 ? 'text-emerald-500' :
+                item.value >= 2.5 ? 'text-sky-500' : 'text-amber-500'
+              }`}>
+                {item.value >= 3.5 ? 'Excellent' : item.value >= 2.5 ? 'Good' : 'Development'}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
