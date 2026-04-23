@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors from Sekolah Literasi Indonesia Logo */
+  --color-brand-navy: #2a3e63;
+  --color-brand-blue: #2e66a3;
+  --color-brand-cyan: #39a0c9;
+  --color-brand-light: #7dcbe1;
+
+  --background-image-gradient-brand: linear-gradient(135deg, #2a3e63 0%, #2e66a3 50%, #39a0c9 100%);
+  --background-image-gradient-brand-reverse: linear-gradient(135deg, #39a0c9 0%, #2e66a3 50%, #2a3e63 100%);
+  --background-image-gradient-cyan: linear-gradient(135deg, #39a0c9 0%, #7dcbe1 100%);
+  --background-image-gradient-blue: linear-gradient(135deg, #2e66a3 0%, #39a0c9 100%);
+
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --shadow-glass-lg: 0 8px 32px 0 rgba(31, 38, 135, 0.5);
+  --shadow-glow-cyan: 0 0 20px rgba(125, 203, 225, 0.5);
+  --shadow-glow-blue: 0 0 20px rgba(57, 160, 201, 0.5);
+
+  --animate-blob: blob 7s infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1) }
+    25% { transform: translate(20px, -50px) scale(1.1) }
+    50% { transform: translate(-20px, 20px) scale(0.9) }
+    75% { transform: translate(50px, 50px) scale(1.05) }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) }
+    50% { transform: translateY(-20px) }
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #39a0c9 0%, #7dcbe1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
