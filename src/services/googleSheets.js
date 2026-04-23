@@ -84,13 +84,12 @@ export async function submitSurvey(formData) {
       scoresArray[14] = formData.M5;
     }
     
-    // Raw data for 'responses' sheet
+    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, S1-S5, K1-K5, M1-M5)
     const rowData = [
       timestamp,
       userId,
       formData.lingkup,
       formData.responden_nama,
-      formData.email || '',
       formData.wilayah || '',
       ...scoresArray
     ];
