@@ -60,14 +60,15 @@ export async function submitSurvey(formData) {
     const userId = generateUserId();
     const timestamp = new Date().toISOString();
     
-    // Dinamis: Ambil semua kode pertanyaan yang ada di answers (S1.1, K1.1, dsb)
-    // Kita buat urutan kolom yang pasti: S1.1-S1.5, K1.1-K1.5, M1.1-M1.5 (Total 15 kolom)
+    // Dinamis: Ambil semua 45 indikator (15 per eko x 3 eko)
     const getScoresArray = () => {
       const result = [];
       ['S', 'K', 'M'].forEach(prefix => {
-        for (let i = 1; i <= 5; i++) {
-          const key = `${prefix}1.${i}`; // Format kode di JSON: S1.1, S1.2, dst
-          result.push(formData[key] || null);
+        for (let v = 1; v <= 5; v++) { // 5 Variabel
+          for (let i = 1; i <= 3; i++) { // 3 Indikator per variabel
+            const key = `${prefix}${v}.${i}`; 
+            result.push(formData[key] || null);
+          }
         }
       });
       return result;
@@ -75,7 +76,7 @@ export async function submitSurvey(formData) {
 
     const scoresArray = getScoresArray();
     
-    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, 15 Skor)
+    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, 15 Skor S, 15 Skor K, 15 Skor M)
     const rowData = [
       timestamp,
       userId,
@@ -99,10 +100,14 @@ export async function submitSurvey(formData) {
     
     // Calculate Score (Hanya yang relevan dengan lingkup saat ini)
     const currentScores = {};
-    const prefix = formData.lingkup === 'SEKOLAH' ? 'S' : formData.lingkup === 'KELUARGA' ? 'K' : 'M';
-    for (let i = 1; i <= 5; i++) {
-      const key = `${prefix}1.${i}`;
-      currentScores[key] = formData[key];
+    const scopePrefix = formData.lingkup === 'SEKOLAH' ? 'S' : formData.lingkup === 'KELUARGA' ? 'K' : 'M';
+    for (let v = 1; v <= 5; v++) {
+      for (let i = 1; i <= 3; i++) {
+        const key = `${scopePrefix}${v}.${i}`;
+        if (formData[key]) {
+          currentScores[key] = formData[key];
+        }
+      }
     }
     
     const weightedScore = calculateWeightedScore(currentScores, formData.lingkup);
