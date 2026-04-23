@@ -66,14 +66,13 @@ export default function QuestionStep({
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background with Brand Colors */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#2a3e63] via-[#2e66a3] to-[#39a0c9]">
-        {/* Animated Orbs */}
-        <div className="absolute top-20 left-20 w-96 h-96 bg-[#7dcbe1] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-[#39a0c9] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-20 left-40 w-96 h-96 bg-[#2e66a3] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-    <div className="min-h-screen relative bg-slate-50">
+    <div className="min-h-screen relative bg-slate-50 overflow-hidden">
+      {/* Clean Light BG Orbs */}
+      <div className="absolute inset-0">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-100 rounded-full blur-3xl opacity-60 animate-blob"></div>
+        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-indigo-50 rounded-full blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
+      </div>
+
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-5xl">
@@ -269,6 +268,7 @@ export default function QuestionStep({
           </div>
         </div>
       </div>
+
       {/* Custom Blob Animations */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes blob {
