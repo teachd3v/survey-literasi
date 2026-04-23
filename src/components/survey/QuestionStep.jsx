@@ -40,6 +40,7 @@ export default function QuestionStep({
   const [selectedValue, setSelectedValue] = useState(value || null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showObservation, setShowObservation] = useState(false);
+  const [hoveredValue, setHoveredValue] = useState(null);
 
   // Reset showObservation when question changes
   useEffect(() => {
