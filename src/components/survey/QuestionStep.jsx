@@ -1,31 +1,11 @@
 // src/components/survey/QuestionStep_Glassmorphism.jsx
 import { useState, useEffect } from 'react';
 
-const SCALE_OPTIONS = [
-  {
-    value: 1,
-    label: 'Tidak Ada / Tidak Pernah',
-    gradient: 'from-red-400 to-red-500',
-    glow: 'shadow-red-500/50'
-  },
-  {
-    value: 2,
-    label: 'Ada tapi belum optimal / Kadang',
-    gradient: 'from-orange-400 to-amber-500',
-    glow: 'shadow-orange-500/50'
-  },
-  {
-    value: 3,
-    label: 'Ada dan cukup baik / Sering',
-    gradient: 'from-cyan-400 to-blue-500',
-    glow: 'shadow-cyan-500/50'
-  },
-  {
-    value: 4,
-    label: 'Ada dan sangat baik / Sangat Sering',
-    gradient: 'from-emerald-400 to-teal-500',
-    glow: 'shadow-emerald-500/50'
-  }
+const FALLBACK_OPTIONS = [
+  { value: 1 },
+  { value: 2 },
+  { value: 3 },
+  { value: 4 }
 ];
 
 export default function QuestionStep({
@@ -39,13 +19,7 @@ export default function QuestionStep({
 }) {
   const [selectedValue, setSelectedValue] = useState(value || null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [showObservation, setShowObservation] = useState(false);
   const [hoveredValue, setHoveredValue] = useState(null);
-
-  // Reset showObservation when question changes
-  useEffect(() => {
-    setShowObservation(false);
-  }, [question.kode]);
 
   // Sync state with props when question or value changes
   useEffect(() => {
@@ -58,6 +32,20 @@ export default function QuestionStep({
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
   };
+
+  const options = (() => {
+    if (!question?.skala_detail) return FALLBACK_OPTIONS;
+    const lines = question.skala_detail.split('\n');
+    const opts = [];
+    lines.forEach(line => {
+      const match = line.trim().match(/^(\d+)\s*[=:]/);
+      if (match) {
+        opts.push({ value: parseInt(match[1]) });
+      }
+    });
+    opts.sort((a, b) => a.value - b.value);
+    return opts.length > 0 ? opts : FALLBACK_OPTIONS;
+  })();
 
   const handleNext = () => {
     if (selectedValue !== null) {
@@ -129,39 +117,15 @@ export default function QuestionStep({
                   </p>
                 </div>
               </div>
-
-              {/* Observation Button - Pill Style */}
-              {question.observasi && (
-                <button
-                  type="button"
-                  onClick={() => setShowObservation(!showObservation)}
-                  className={`
-                    shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all border
-                    ${showObservation 
-                      ? 'bg-sky-600 text-white border-sky-600 shadow-md' 
-                      : 'bg-white text-sky-600 border-slate-200 hover:border-sky-300'}
-                  `}
-                >
-                  {showObservation ? 'Tutup Tips' : '💡 Tips'}
-                </button>
-              )}
             </div>
-
-            {/* Observation Content - High Contrast Overlay */}
-            {showObservation && (
-              <div className="mb-4 p-3 rounded-xl bg-sky-50 border border-sky-100 animate-in fade-in slide-in-from-top-1 duration-200">
-                <p className="text-sky-900 text-[10px] md:text-xs font-bold leading-relaxed">
-                  {question.observasi}
-                </p>
-              </div>
-            )}
 
             {/* Interactive Star Rating Selection - Compacted Gap */}
             <div className="flex flex-col items-center py-1 md:py-2">
               <div className="flex justify-center items-center gap-3 md:gap-8 mb-4">
-                {SCALE_OPTIONS.map((option) => {
+                {options.map((option) => {
                   const isSelected = selectedValue === option.value;
-                  const isActive = (hoveredValue || selectedValue) >= option.value;
+                  const currentVal = hoveredValue !== null ? hoveredValue : (selectedValue !== null ? selectedValue : -1);
+                  const isActive = currentVal >= option.value;
                   
                   return (
                     <div 
@@ -206,17 +170,17 @@ export default function QuestionStep({
               </div>
 
               {/* Dynamic Description - High Contrast Pill */}
-              <div className="w-full max-w-md">
+              <div className="w-full max-w-3xl">
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 md:p-4 text-center min-h-[60px] flex items-center justify-center">
                    <p className={`
                      text-[10px] md:text-xs font-black uppercase tracking-widest leading-relaxed transition-all duration-300
-                     ${(hoveredValue || selectedValue) ? 'text-slate-800' : 'text-slate-500 italic'}
+                     ${(hoveredValue !== null || selectedValue !== null) ? 'text-slate-800' : 'text-slate-500 italic'}
                    `}>
                       {(() => {
-                        const target = hoveredValue || selectedValue || 0;
+                        const target = hoveredValue !== null ? hoveredValue : (selectedValue !== null ? selectedValue : null);
                         const questionDesc = question.skala_detail;
                         
-                        if (target > 0) {
+                        if (target !== null) {
                           if (questionDesc) {
                             const lines = questionDesc.split('\n');
                             const line = lines.find(l => {
@@ -225,10 +189,10 @@ export default function QuestionStep({
                             });
                             if (line) {
                               const parts = line.split(/[=:]/);
-                              return parts[parts.length - 1].trim();
+                              return parts.slice(1).join('=').trim();
                             }
                           }
-                          return SCALE_OPTIONS.find(o => o.value === target)?.label;
+                          return `Skala ${target}`;
                         }
                         return "Pilih bintang untuk menilai";
                       })()}

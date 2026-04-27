@@ -7,13 +7,15 @@ import IndicatorRadar from '../components/dashboard/IndicatorRadar';
 import { fetchDashboardStats } from '../services/googleSheets';
 
 export default function DashboardPage() {
+  const [surveyType, setSurveyType] = useState('literasi'); // 'literasi' or 'minatbaca'
   const [stats, setStats] = useState(null);
   const [activeLingkup, setActiveLingkup] = useState('SEKOLAH');
   const [loading, setLoading] = useState(true);
 
-  const loadData = async () => {
+  const loadData = async (type = surveyType) => {
+    setLoading(true);
     try {
-      const dashboardData = await fetchDashboardStats();
+      const dashboardData = await fetchDashboardStats(type);
       setStats(dashboardData);
     } catch (error) {
       console.error(error);
@@ -24,7 +26,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [surveyType]);
+
+  const handleTypeChange = (type) => {
+    setSurveyType(type);
+    setActiveLingkup(type === 'minatbaca' ? 'SD KELAS 1-3' : 'SEKOLAH');
+  };
 
   if (loading) {
     return (
@@ -42,13 +49,13 @@ export default function DashboardPage() {
       {/* Floating Back Button */}
       <div className="fixed bottom-8 right-8 z-50">
         <Link 
-          to="/survey"
+          to="/"
           className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-105 active:scale-95 transition-all"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Kembali ke Survey
+          Kembali ke Beranda
         </Link>
       </div>
 
@@ -56,15 +63,34 @@ export default function DashboardPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-100 rounded-lg mb-4">
-              <div className="w-2 h-2 bg-sky-600 rounded-full animate-pulse"></div>
-              <span className="text-sky-700 font-black text-[10px] uppercase tracking-widest">Real-time Analytics</span>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <button 
+                onClick={() => handleTypeChange('literasi')}
+                className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 ${
+                  surveyType === 'literasi' ? 'bg-sky-600 border-sky-600 text-white shadow-lg' : 'bg-white border-slate-200 text-slate-400 hover:border-sky-200'
+                }`}
+              >
+                Ekosistem Literasi
+              </button>
+              <button 
+                onClick={() => handleTypeChange('minatbaca')}
+                className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 ${
+                  surveyType === 'minatbaca' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg' : 'bg-white border-slate-200 text-slate-400 hover:border-emerald-200'
+                }`}
+              >
+                Minat Baca
+              </button>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg mb-4">
+              <div className={`w-2 h-2 rounded-full animate-pulse ${surveyType === 'minatbaca' ? 'bg-emerald-600' : 'bg-sky-600'}`}></div>
+              <span className="text-slate-600 font-black text-[10px] uppercase tracking-widest">Real-time Analytics</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">
-              Dashboard Literasi
+              Dashboard {surveyType === 'minatbaca' ? 'Minat Baca' : 'Literasi'}
             </h1>
             <p className="text-slate-500 font-medium text-lg">
-              Visualisasi pemetaan ekosistem literasi nasional 2026.
+              Visualisasi pemetaan {surveyType === 'minatbaca' ? 'minat baca masyarakat' : 'ekosistem literasi nasional'} 2026.
             </p>
           </div>
           <div className="flex flex-col items-end">
@@ -160,15 +186,18 @@ export default function DashboardPage() {
               <p className="text-slate-400 text-sm font-medium">Breakdown skor per butir indikator strategis (15 Poin)</p>
             </div>
             {/* Custom Tabs */}
-            <div className="flex bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
-              {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map(l => (
+            <div className="flex flex-wrap gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+              {(surveyType === 'minatbaca' 
+                ? ['SD KELAS 1-3', 'SD KELAS 4-6', 'SMP-SMA', 'DEWASA']
+                : ['SEKOLAH', 'KELUARGA', 'MASYARAKAT']
+              ).map(l => (
                 <button
                   key={l}
                   onClick={() => setActiveLingkup(l)}
                   className={`
-                    px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
+                    px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
                     ${activeLingkup === l 
-                      ? 'bg-white text-sky-600 shadow-lg shadow-slate-200 scale-105 z-10' 
+                      ? `bg-white ${surveyType === 'minatbaca' ? 'text-emerald-600' : 'text-sky-600'} shadow-lg shadow-slate-200 scale-105 z-10` 
                       : 'text-slate-400 hover:text-slate-600'}
                   `}
                 >
@@ -177,7 +206,7 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-          <IndicatorRadar lingkup={activeLingkup} />
+          <IndicatorRadar lingkup={activeLingkup} surveyType={surveyType} />
         </div>
       </div>
     </div>

@@ -1,12 +1,16 @@
 // src/pages/SurveyPage.jsx
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import QuestionStep from '../components/survey/QuestionStep';
-import { SURVEY_QUESTIONS } from '../utils/constants';
-import { submitSurvey } from '../services/googleSheets';
+import { submitSurvey, fetchInstrumen } from '../services/googleSheets';
 
-export default function SurveyPage() {
-  const [step, setStep] = useState('WELCOME'); // WELCOME, IDENTITY, QUESTIONS, REVIEW, SUCCESS
-  const [lingkup, setLingkup] = useState(null);
+export default function SurveyPage({ type = 'literasi' }) {
+  const { lingkupParam } = useParams();
+  const navigate = useNavigate();
+  // decode parameter to support spaces
+  const lingkup = lingkupParam ? decodeURIComponent(lingkupParam).toUpperCase() : null;
+
+  const [step, setStep] = useState('IDENTITY'); // IDENTITY, QUESTIONS, REVIEW, SUCCESS
   const [identity, setIdentity] = useState({ 
     responden_nama: '', 
     wilayah: '' 
@@ -14,8 +18,32 @@ export default function SurveyPage() {
   const [answers, setAnswers] = useState({});
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [surveyQuestions, setSurveyQuestions] = useState(null);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   // --- Effects ---
+  
+  // Load instrumen on mount
+  useEffect(() => {
+    async function loadInstrumen() {
+      try {
+        const sheetName = type === 'minatbaca' ? 'instrumen_minatbaca' : 'instrumen_literasi';
+        const data = await fetchInstrumen(sheetName);
+        if (data) {
+          setSurveyQuestions(data);
+        } else {
+          setFetchError("Data instrumen kosong atau gagal dimuat.");
+        }
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    }
+    loadInstrumen();
+  }, []);
   
   // Confetti effect on success
   useEffect(() => {
@@ -46,23 +74,18 @@ export default function SurveyPage() {
 
   // --- Step Handlers ---
 
-  const startSurvey = (l) => {
-    setLingkup(l);
-    setStep('IDENTITY');
-  };
-
   const handleIdentitySubmit = (e) => {
     e.preventDefault();
     setStep('QUESTIONS');
   };
 
   const handleAnswer = (val) => {
-    const q = SURVEY_QUESTIONS[lingkup][currentQuestionIdx];
+    const q = surveyQuestions[lingkup][currentQuestionIdx];
     setAnswers(prev => ({ ...prev, [q.kode]: val }));
   };
 
   const nextQuestion = () => {
-    if (currentQuestionIdx < SURVEY_QUESTIONS[lingkup].length - 1) {
+    if (currentQuestionIdx < surveyQuestions[lingkup].length - 1) {
       setCurrentQuestionIdx(prev => prev + 1);
     } else {
       setStep('REVIEW');
@@ -85,7 +108,7 @@ export default function SurveyPage() {
         ...identity,
         ...answers
       };
-      await submitSurvey(payload);
+      await submitSurvey(payload, surveyQuestions, type);
       setStep('SUCCESS');
     } catch (error) {
       alert(error.message);
@@ -96,39 +119,29 @@ export default function SurveyPage() {
 
   // --- Renderers ---
 
-  if (step === 'WELCOME') {
+  if (isLoadingQuestions) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-white flex items-center justify-center p-4">
-        {/* Clean Light BG Orbs */}
-        <div className="absolute inset-0 bg-slate-50">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-100 rounded-full blur-3xl opacity-60 animate-blob"></div>
-          <div className="absolute top-1/2 -right-24 w-96 h-96 bg-indigo-50 rounded-full blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
+      <div className="min-h-screen relative flex items-center justify-center p-4 bg-slate-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-bold animate-pulse">Memuat instrumen survey dari spreadsheet...</p>
         </div>
+      </div>
+    );
+  }
 
-        <div className="relative z-10 w-full max-w-4xl text-center">
-          <h1 className="text-4xl md:text-7xl font-black text-slate-900 mb-4 md:mb-8 tracking-tighter px-4">
-            Survey Ekosistem <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-800">
-              Literasi Indonesia
-            </span>
-          </h1>
-          <p className="text-slate-500 text-sm md:text-xl mb-8 md:mb-16 max-w-2xl mx-auto px-6 font-medium leading-relaxed">
-            Bantu kami memetakan indeks literasi untuk menciptakan ekosistem belajar yang lebih baik dan berkelanjutan.
-          </p>
+  const validLingkup = type === 'minatbaca' 
+    ? ['SD KELAS 1-3', 'SD KELAS 4-6', 'SMP-SMA', 'DEWASA']
+    : ['SEKOLAH', 'KELUARGA', 'MASYARAKAT'];
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 px-4">
-            {['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].map((l) => (
-              <button
-                key={l}
-                onClick={() => startSurvey(l)}
-                className="group relative bg-white rounded-3xl border-2 border-slate-100 p-6 md:p-10 transition-all hover:border-sky-500 hover:shadow-2xl hover:shadow-sky-200 hover:-translate-y-2 active:scale-95"
-              >
-                <div className="text-4xl md:text-5xl mb-4 md:mb-6">{l === 'SEKOLAH' ? '🏫' : l === 'KELUARGA' ? '🏠' : '🌍'}</div>
-                <h3 className="text-lg md:text-2xl font-black text-slate-800 mb-2">{l}</h3>
-                <div className="w-8 h-1 bg-sky-500 mx-auto rounded-full group-hover:w-16 transition-all duration-500"></div>
-              </button>
-            ))}
-          </div>
+  if (fetchError || !lingkup || !validLingkup.includes(lingkup)) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center p-4 bg-slate-50">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md text-center border-2 border-red-100">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-black text-slate-800 mb-2">Gagal Memuat Data</h2>
+          <p className="text-slate-500 mb-6">{fetchError || "Lingkup survey tidak valid."}</p>
+          <button onClick={() => navigate(type === 'minatbaca' ? '/minatbaca' : '/literasi')} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">Kembali ke Beranda</button>
         </div>
       </div>
     );
@@ -178,7 +191,7 @@ export default function SurveyPage() {
   }
 
   if (step === 'QUESTIONS') {
-    const questions = SURVEY_QUESTIONS[lingkup];
+    const questions = surveyQuestions[lingkup];
     const q = questions[currentQuestionIdx];
     return (
       <QuestionStep
@@ -194,7 +207,7 @@ export default function SurveyPage() {
   }
 
   if (step === 'REVIEW') {
-    const questions = SURVEY_QUESTIONS[lingkup];
+    const questions = surveyQuestions[lingkup];
     return (
       <div className="min-h-screen relative overflow-hidden bg-slate-50 flex items-center justify-center p-4">
         <div className="relative z-10 w-full max-w-2xl bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200">

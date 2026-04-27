@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { fetchIndicatorBreakdown } from '../../services/googleSheets';
 
-export default function IndicatorRadar({ lingkup }) {
+export default function IndicatorRadar({ lingkup, surveyType = 'literasi' }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +11,7 @@ export default function IndicatorRadar({ lingkup }) {
     async function loadBreakdown() {
       setLoading(true);
       try {
-        const breakdown = await fetchIndicatorBreakdown(lingkup);
+        const breakdown = await fetchIndicatorBreakdown(lingkup, surveyType);
         setData(breakdown);
       } catch (error) {
         console.error(error);
@@ -20,7 +20,7 @@ export default function IndicatorRadar({ lingkup }) {
       }
     }
     loadBreakdown();
-  }, [lingkup]);
+  }, [lingkup, surveyType]);
 
   if (loading) return <div className="h-64 flex items-center justify-center text-slate-400 font-bold animate-pulse">Menghitung Indikator...</div>;
 
