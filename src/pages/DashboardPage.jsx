@@ -1,21 +1,23 @@
-// src/pages/DashboardPage.jsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatCard from '../components/dashboard/StatCard';
 import LingkupComparison from '../components/dashboard/LingkupComparison';
 import IndicatorRadar from '../components/dashboard/IndicatorRadar';
-import { fetchDashboardStats } from '../services/googleSheets';
+import ComparisonChart from '../components/dashboard/ComparisonChart';
+import QualitativeAdvice from '../components/dashboard/QualitativeAdvice';
+import { fetchNeonStats } from '../services/neon';
 
 export default function DashboardPage() {
   const [surveyType, setSurveyType] = useState('literasi'); // 'literasi' or 'minatbaca'
   const [stats, setStats] = useState(null);
   const [activeLingkup, setActiveLingkup] = useState('SEKOLAH');
   const [loading, setLoading] = useState(true);
+  const [radarClusters, setRadarClusters] = useState([]);
 
   const loadData = async (type = surveyType) => {
     setLoading(true);
     try {
-      const dashboardData = await fetchDashboardStats(type);
+      const dashboardData = await fetchNeonStats(type);
       setStats(dashboardData);
     } catch (error) {
       console.error(error);
@@ -31,6 +33,7 @@ export default function DashboardPage() {
   const handleTypeChange = (type) => {
     setSurveyType(type);
     setActiveLingkup(type === 'minatbaca' ? 'SD KELAS 1-3' : 'SEKOLAH');
+    setRadarClusters([]);
   };
 
   if (loading) {
@@ -116,7 +119,7 @@ export default function DashboardPage() {
           />
           <StatCard 
             title="Kategori Dominan" 
-            value={stats?.categoryDistribution ? Object.entries(stats.categoryDistribution).sort((a,b) => b[1]-a[1])[0][0] : '-'}
+            value={(() => { const e = Object.entries(stats?.categoryDistribution || {}); return e.length ? e.sort((a,b) => b[1]-a[1])[0][0] : '-'; })()}
             icon="award"
             subtitle="Berdasarkan sebaran"
             color="emerald"
@@ -145,27 +148,30 @@ export default function DashboardPage() {
           </div>
 
           {/* Sidebar Section - Top Row Right */}
-          <div className="space-y-6">
-            <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl h-[calc(50%-12px)] overflow-hidden">
+          <div className="flex flex-col gap-6 h-full">
+            <div className="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-2xl flex-1 overflow-hidden">
               <h4 className="text-xl font-black mb-6 uppercase tracking-widest text-[#7dcbe1]">Interpretasi</h4>
               <div className="space-y-4">
-                {stats?.categoryDistribution && Object.entries(stats.categoryDistribution).map(([cat, count]) => (
-                  <div key={cat} className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        cat === 'Sangat Baik' ? 'bg-emerald-400' :
-                        cat === 'Baik' ? 'bg-sky-400' :
-                        cat === 'Berkembang' ? 'bg-amber-400' : 'bg-red-400'
-                      }`}></div>
-                      <span className="text-slate-200 font-bold text-sm">{cat}</span>
+                {stats?.categoryDistribution && Object.entries(stats.categoryDistribution).length > 0
+                  ? Object.entries(stats.categoryDistribution).map(([cat, count]) => (
+                    <div key={cat} className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          cat === 'Sangat Baik' ? 'bg-emerald-400' :
+                          cat === 'Baik' ? 'bg-sky-400' :
+                          cat === 'Berkembang' ? 'bg-amber-400' : 'bg-red-400'
+                        }`}></div>
+                        <span className="text-slate-200 font-bold text-sm">{cat}</span>
+                      </div>
+                      <span className="font-black text-lg">{count}</span>
                     </div>
-                    <span className="font-black text-lg">{count}</span>
-                  </div>
-                ))}
+                  ))
+                  : <p className="text-slate-500 font-bold text-sm">Belum ada data</p>
+                }
               </div>
             </div>
 
-            <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl h-[calc(50%-12px)] relative overflow-hidden group">
+            <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
               <div className="relative z-10">
                 <h4 className="text-xl font-black mb-1 uppercase tracking-widest">Target</h4>
                 <div className="text-5xl font-black mb-2">18.7%</div>
@@ -176,6 +182,15 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Perbandingan Identitas - Full Width */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50 mb-8">
+          <div className="mb-8">
+            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Perbandingan Lokasi</h3>
+            <p className="text-slate-400 text-sm font-medium">Bandingkan capaian antar kabupaten, sekolah, TBM, dan RT/RW</p>
+          </div>
+          <ComparisonChart surveyType={surveyType} />
         </div>
 
         {/* Detail Indikator - Full Width Bottom Row */}
@@ -193,7 +208,7 @@ export default function DashboardPage() {
               ).map(l => (
                 <button
                   key={l}
-                  onClick={() => setActiveLingkup(l)}
+                  onClick={() => { setActiveLingkup(l); setRadarClusters([]); }}
                   className={`
                     px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all
                     ${activeLingkup === l 
@@ -206,7 +221,12 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-          <IndicatorRadar lingkup={activeLingkup} surveyType={surveyType} />
+          <IndicatorRadar 
+            lingkup={activeLingkup} 
+            surveyType={surveyType} 
+            onDataLoaded={setRadarClusters} 
+          />
+          <QualitativeAdvice surveyType={surveyType} lingkup={activeLingkup} clusters={radarClusters} />
         </div>
       </div>
     </div>

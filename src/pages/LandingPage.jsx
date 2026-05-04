@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LandingPage() {
@@ -10,6 +9,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-white flex items-center justify-center p-4">
+      <button onClick={() => navigate('/')} className="fixed top-6 left-6 z-50 flex items-center gap-2 bg-white border-2 border-slate-100 text-slate-600 px-4 py-2.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:border-sky-300 hover:text-sky-600 transition-all">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Portal
+      </button>
       {/* Clean Light BG Orbs */}
       <div className="absolute inset-0 bg-slate-50">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-100 rounded-full blur-3xl opacity-60 animate-blob"></div>

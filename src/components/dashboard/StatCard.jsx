@@ -1,5 +1,4 @@
 // src/components/dashboard/StatCard.jsx
-import React from 'react';
 
 export default function StatCard({ title, value, icon, subtitle, color = 'sky' }) {
   const getIcon = () => {

@@ -443,3 +443,35 @@ export async function fetchInstrumen(sheetName = 'instrumen_literasi') {
     throw new Error('Gagal memuat instrumen dari spreadsheet. Pastikan sheet "instrumen" ada dan format sesuai.');
   }
 }
+
+/**
+ * Fetch identity_validation sheet — cascading dropdown data
+ * Returns: { [kabupaten]: { [desa]: { tbm: string, sekolah: string[] } } }
+ */
+export async function fetchIdentityValidation() {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/${SPREADSHEET_ID}/values/identity_validation!A:D`,
+      { params: { key: API_KEY } }
+    );
+    const rows = response.data.values;
+    if (!rows || rows.length < 2) return {};
+
+    const result = {};
+    rows.slice(1).forEach(row => {
+      const [kabupaten, desa, tbm, sekolah] = row;
+      if (!kabupaten) return;
+      if (!result[kabupaten]) result[kabupaten] = {};
+      if (desa) {
+        if (!result[kabupaten][desa]) result[kabupaten][desa] = { tbm: tbm || '', sekolah: [] };
+        if (sekolah && !result[kabupaten][desa].sekolah.includes(sekolah)) {
+          result[kabupaten][desa].sekolah.push(sekolah);
+        }
+      }
+    });
+    return result;
+  } catch (error) {
+    console.error('Error fetching identity validation:', error);
+    return {};
+  }
+}

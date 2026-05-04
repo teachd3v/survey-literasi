@@ -1,16 +1,27 @@
 // src/components/dashboard/LingkupComparison.jsx
-import React from 'react';
+
+const LINGKUP_COLORS = {
+  'SEKOLAH':      'bg-sky-600',
+  'KELUARGA':     'bg-emerald-600',
+  'MASYARAKAT':   'bg-slate-700',
+  'SD KELAS 1-3': 'bg-violet-500',
+  'SD KELAS 4-6': 'bg-emerald-500',
+  'SMP-SMA':      'bg-amber-500',
+  'DEWASA':       'bg-rose-500',
+};
 
 export default function LingkupComparison({ data }) {
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0) return (
+    <div className="h-48 flex items-center justify-center">
+      <p className="text-slate-400 font-bold text-sm">Belum ada data responden</p>
+    </div>
+  );
 
   return (
     <div className="space-y-8">
       {data.map((item) => {
         const percentage = (item.avg_score / 4) * 100;
-        const colorClass = 
-          item.lingkup === 'SEKOLAH' ? 'bg-sky-600' :
-          item.lingkup === 'KELUARGA' ? 'bg-emerald-600' : 'bg-slate-900';
+        const colorClass = LINGKUP_COLORS[item.lingkup] ?? 'bg-slate-600';
         
         return (
           <div key={item.lingkup} className="relative">
