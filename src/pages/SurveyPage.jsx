@@ -127,11 +127,18 @@ export default function SurveyPage({ type = 'literasi' }) {
     try {
       const questions = surveyQuestions[lingkup];
       
-      // Hitung skor sederhana (Persentase dari total bobot)
+      // Hitung total bobot untuk auto-normalisasi
+      const totalBobot = questions.reduce((sum, q) => sum + (parseFloat(q.bobot) || 1), 0);
+      
+      // Hitung skor terskala otomatis
       let totalWeightedScore = 0;
       questions.forEach(q => {
         const val = answers[q.kode] || 0;
-        totalWeightedScore += (val * q.bobot);
+        const currentBobot = parseFloat(q.bobot) || 1;
+        const proporsionalBobot = totalBobot > 0 ? (currentBobot / totalBobot) : 0;
+        
+        // Asumsi nilai max per soal adalah 4. Jika bobot dinormalkan (sum = 1), max total = 4.0
+        totalWeightedScore += (val * proporsionalBobot);
       });
 
       // Kalkulasi kategori (Logika sederhana)

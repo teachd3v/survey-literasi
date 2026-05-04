@@ -36,155 +36,7 @@ function getCategory(score) {
   return 'Perlu Perhatian';
 }
 
-/**
- * Submit survey response
- */
-export async function submitSurvey(formData, dynamicQuestions, surveyType = 'literasi') {
-  try {
-    const userId = generateUserId();
-    const timestamp = new Date().toISOString();
-    
-    // Dinamis: Ambil indikator sesuai tipe
-    const getScoresArray = () => {
-      const result = [];
-      if (surveyType === 'minatbaca') {
-        // SD Kelas 1-3 (13 items)
-        for (let i = 1; i <= 13; i++) result.push(formData[`SD1.${i}`] !== undefined ? formData[`SD1.${i}`] : null);
-        // SD Kelas 4-6 (15 items)
-        for (let i = 1; i <= 15; i++) result.push(formData[`SD2.${i}`] !== undefined ? formData[`SD2.${i}`] : null);
-        // SMP-SMA (21 items)
-        for (let i = 1; i <= 21; i++) result.push(formData[`SMP1.${i}`] !== undefined ? formData[`SMP1.${i}`] : null);
-        // Dewasa (26 items)
-        for (let i = 1; i <= 26; i++) result.push(formData[`D1.${i}`] !== undefined ? formData[`D1.${i}`] : null);
-      } else {
-        ['S', 'K', 'M'].forEach(prefix => {
-          for (let v = 1; v <= 5; v++) { // 5 Variabel
-            for (let i = 1; i <= 3; i++) { // 3 Indikator per variabel
-              const key = `${prefix}${v}.${i}`; 
-              result.push(formData[key] !== undefined ? formData[key] : null);
-            }
-          }
-        });
-      }
-      return result;
-    };
 
-    const scoresArray = getScoresArray();
-    
-    // Row data for 'responses' sheet (Urutan: Timestamp, ID, Lingkup, Nama, Wilayah, 15 Skor S, 15 Skor K, 15 Skor M)
-    const rowData = [
-      timestamp,
-      userId,
-      formData.lingkup,
-      formData.responden_nama,
-      formData.wilayah || '',
-      ...scoresArray
-    ];
-    
-    // Submit to Apps Script Proxy
-    const SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
-    const sheetResponses = surveyType === 'minatbaca' ? 'response_minatbaca' : 'responses';
-    
-    console.log('DEBUG: Mengirim ke Apps Script URL:', SCRIPT_URL);
-    console.log(`DEBUG: Data Responses Row (${sheetResponses}):`, rowData);
-
-    if (SCRIPT_URL) {
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            sheetName: sheetResponses,
-            values: rowData
-          })
-        });
-      } catch (e) {
-        console.error('DEBUG: Apps Script Error (responses):', e);
-      }
-    }
-    
-    // Calculate Score (Hanya yang relevan dengan lingkup saat ini)
-    const currentScores = {};
-    if (surveyType === 'minatbaca') {
-      let prefix = '';
-      let maxItems = 0;
-      if (formData.lingkup === 'SD KELAS 1-3') { prefix = 'SD1.'; maxItems = 13; }
-      else if (formData.lingkup === 'SD KELAS 4-6') { prefix = 'SD2.'; maxItems = 15; }
-      else if (formData.lingkup === 'SMP-SMA') { prefix = 'SMP1.'; maxItems = 21; }
-      else if (formData.lingkup === 'DEWASA') { prefix = 'D1.'; maxItems = 26; }
-      
-      for (let i = 1; i <= maxItems; i++) {
-        const key = `${prefix}${i}`;
-        if (formData[key] !== undefined && formData[key] !== null) {
-          currentScores[key] = formData[key];
-        }
-      }
-    } else {
-      const scopePrefix = formData.lingkup === 'SEKOLAH' ? 'S' : formData.lingkup === 'KELUARGA' ? 'K' : 'M';
-      for (let v = 1; v <= 5; v++) {
-        for (let i = 1; i <= 3; i++) {
-          const key = `${scopePrefix}${v}.${i}`;
-          if (formData[key] !== undefined && formData[key] !== null) {
-            currentScores[key] = formData[key];
-          }
-        }
-      }
-    }
-    
-    // Bangun bobot map dari dynamicQuestions
-    const bobotMap = {};
-    if (dynamicQuestions) {
-      Object.keys(dynamicQuestions).forEach(lingkup => {
-        bobotMap[lingkup] = {};
-        dynamicQuestions[lingkup].forEach(q => {
-          bobotMap[lingkup][q.kode] = q.bobot;
-        });
-      });
-    }
-    
-    const weightedScore = calculateWeightedScore(currentScores, formData.lingkup, bobotMap);
-    const category = getCategory(weightedScore);
-    
-    console.log('DEBUG: Data Calculated values:', [userId, formData.lingkup, weightedScore.toFixed(2), category]);
-
-    // Submit to Apps Script Proxy (calculated_scores sheet)
-    const sheetCalculated = surveyType === 'minatbaca' ? 'calculated_scores_minatbaca' : 'calculated_scores';
-    if (SCRIPT_URL) {
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            sheetName: sheetCalculated,
-            values: [
-              userId,
-              formData.lingkup,
-              (weightedScore * 100).toFixed(2),
-              weightedScore.toFixed(2),
-              category,
-              timestamp
-            ]
-          })
-        });
-      } catch (e) {
-        console.error('DEBUG: Apps Script Error (calculated):', e);
-      }
-    }
-    
-    return {
-      success: true,
-      userId,
-      score: weightedScore,
-      category
-    };
-    
-  } catch (error) {
-    console.error('Error submitting survey:', error);
-    throw new Error('Gagal mengirim survey. Silakan coba lagi.');
-  }
-}
 
 /**
  * Fetch dashboard statistics
@@ -422,8 +274,9 @@ export async function fetchInstrumen(sheetName = 'instrumen_literasi') {
         row[11] ? `4 = ${row[11]}` : ''
       ].filter(s => s !== '').join('\n');
       
-      let bobot = row[12] ? row[12].toString().replace(',', '.') : '0';
-      bobot = parseFloat(bobot) || 0;
+      let bobot = row[12] ? row[12].toString().replace(',', '.') : '1';
+      bobot = parseFloat(bobot);
+      if (isNaN(bobot)) bobot = 1;
       
       instrumen[lingkup].push({
         kode_variabel: row[1] || '',
