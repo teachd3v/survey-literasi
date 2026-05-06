@@ -1,8 +1,15 @@
 import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
-import { eq, avg, count, and, ne } from 'drizzle-orm';
+import { eq, avg, count, and, ne, gte, lt } from 'drizzle-orm';
 
 const VALID_GROUP_BY = ['kabupaten', 'tbm', 'sekolah', 'desa_rt'];
+
+function buildWhere(type, extraCond, dateFrom, dateTo) {
+  const conds = [eq(respondents.surveyType, type), extraCond];
+  if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
+  if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
+  return and(...conds);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,7 +18,7 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', groupBy = 'kabupaten' } = req.query;
+    const { type = 'literasi', groupBy = 'kabupaten', dateFrom, dateTo } = req.query;
 
     if (!VALID_GROUP_BY.includes(groupBy)) {
       return res.status(400).json({ error: 'Invalid groupBy parameter' });
@@ -27,7 +34,7 @@ export default async function handler(req, res) {
       })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(and(eq(respondents.surveyType, type), ne(respondents.kabupaten, '')))
+        .where(buildWhere(type, ne(respondents.kabupaten, ''), dateFrom, dateTo))
         .groupBy(respondents.kabupaten);
 
     } else if (groupBy === 'tbm') {
@@ -38,7 +45,7 @@ export default async function handler(req, res) {
       })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(and(eq(respondents.surveyType, type), ne(respondents.tbm, '')))
+        .where(buildWhere(type, ne(respondents.tbm, ''), dateFrom, dateTo))
         .groupBy(respondents.tbm);
 
     } else if (groupBy === 'sekolah') {
@@ -49,7 +56,7 @@ export default async function handler(req, res) {
       })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(and(eq(respondents.surveyType, type), ne(respondents.sekolah, '')))
+        .where(buildWhere(type, ne(respondents.sekolah, ''), dateFrom, dateTo))
         .groupBy(respondents.sekolah);
 
     } else if (groupBy === 'desa_rt') {
@@ -62,7 +69,7 @@ export default async function handler(req, res) {
       })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(and(eq(respondents.surveyType, type), ne(respondents.desa, '')))
+        .where(buildWhere(type, ne(respondents.desa, ''), dateFrom, dateTo))
         .groupBy(respondents.desa, respondents.rt, respondents.rw);
 
       return res.status(200).json(

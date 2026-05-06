@@ -16,9 +16,12 @@ export async function submitToNeon(payload) {
   }
 }
 
-export async function fetchNeonStats(surveyType) {
+export async function fetchNeonStats(surveyType, { dateFrom, dateTo } = {}) {
   try {
-    const response = await axios.get('/api/stats', { params: { type: surveyType } });
+    const params = { type: surveyType };
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+    const response = await axios.get('/api/stats', { params });
     return response.data;
   } catch (error) {
     console.error('Service Error (Stats):', error);
@@ -26,11 +29,12 @@ export async function fetchNeonStats(surveyType) {
   }
 }
 
-export async function fetchNeonComparison(surveyType, groupBy) {
+export async function fetchNeonComparison(surveyType, groupBy, { dateFrom, dateTo } = {}) {
   try {
-    const response = await axios.get(
-      `/api/comparison?type=${encodeURIComponent(surveyType)}&groupBy=${encodeURIComponent(groupBy)}`
-    );
+    const params = { type: surveyType, groupBy };
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+    const response = await axios.get('/api/comparison', { params });
     return response.data;
   } catch (error) {
     console.error('Service Error (Comparison):', error);
@@ -38,11 +42,12 @@ export async function fetchNeonComparison(surveyType, groupBy) {
   }
 }
 
-export async function fetchNeonIndicators(surveyType, lingkup) {
+export async function fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo } = {}) {
   try {
-    const response = await axios.get(
-      `/api/indicators?type=${encodeURIComponent(surveyType)}&lingkup=${encodeURIComponent(lingkup)}`
-    );
+    const params = { type: surveyType, lingkup };
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+    const response = await axios.get('/api/indicators', { params });
     return response.data;
   } catch (error) {
     console.error('Service Error (Indicators):', error);

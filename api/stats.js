@@ -1,6 +1,13 @@
 import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
-import { eq, avg, count } from 'drizzle-orm';
+import { eq, avg, count, and, gte, lt } from 'drizzle-orm';
+
+function buildWhere(type, dateFrom, dateTo) {
+  const conds = [eq(respondents.surveyType, type)];
+  if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
+  if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
+  return and(...conds);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -9,22 +16,23 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi' } = req.query;
+    const { type = 'literasi', dateFrom, dateTo } = req.query;
+    const where = buildWhere(type, dateFrom, dateTo);
 
     const [totalRes, avgRes, catRes, lingkupRes] = await Promise.all([
       db.select({ count: count() })
         .from(respondents)
-        .where(eq(respondents.surveyType, type)),
+        .where(where),
 
       db.select({ avg: avg(results.weightedAvg) })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(eq(respondents.surveyType, type)),
+        .where(where),
 
       db.select({ category: results.category, count: count() })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(eq(respondents.surveyType, type))
+        .where(where)
         .groupBy(results.category),
 
       db.select({
@@ -34,7 +42,7 @@ export default async function handler(req, res) {
       })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
-        .where(eq(respondents.surveyType, type))
+        .where(where)
         .groupBy(respondents.lingkup),
     ]);
 

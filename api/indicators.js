@@ -1,6 +1,6 @@
 import { getDb } from './_db.js';
 import { respondents, answers } from '../src/db/schema.js';
-import { eq, avg, and } from 'drizzle-orm';
+import { eq, avg, and, gte, lt } from 'drizzle-orm';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -9,11 +9,18 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', lingkup } = req.query;
+    const { type = 'literasi', lingkup, dateFrom, dateTo } = req.query;
 
     if (!lingkup) {
       return res.status(400).json({ error: 'lingkup is required' });
     }
+
+    const conds = [
+      eq(respondents.surveyType, type),
+      eq(respondents.lingkup, lingkup.toUpperCase()),
+    ];
+    if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
+    if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
 
     const rows = await db.select({
       indicator: answers.questionCode,
@@ -21,10 +28,7 @@ export default async function handler(req, res) {
     })
       .from(answers)
       .innerJoin(respondents, eq(answers.respondentId, respondents.id))
-      .where(and(
-        eq(respondents.surveyType, type),
-        eq(respondents.lingkup, lingkup.toUpperCase())
-      ))
+      .where(and(...conds))
       .groupBy(answers.questionCode)
       .orderBy(answers.questionCode);
 

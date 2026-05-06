@@ -28,13 +28,13 @@ export default function MinatBacaLandingPage() {
 
       <div className="relative z-10 w-full max-w-5xl text-center">
         <h1 className="text-4xl md:text-7xl font-black text-slate-900 mb-4 md:mb-8 tracking-tighter px-4">
-          Survey Perilaku <br />
+          Indeks <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-700">
             Minat Baca
           </span>
         </h1>
         <p className="text-slate-500 text-sm md:text-xl mb-8 md:mb-16 max-w-2xl mx-auto px-6 font-medium leading-relaxed">
-          Bantu kami mengukur kebiasaan dan ketertarikan membaca berdasarkan kelompok usia.
+          Merupakan alat ukur yang dikembangkan oleh Sekolah Literasi Indonesia untuk mengukur minat baca dari jenjang usia SD hingga Dewasa.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-4">

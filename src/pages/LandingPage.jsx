@@ -21,13 +21,13 @@ export default function LandingPage() {
 
       <div className="relative z-10 w-full max-w-4xl text-center">
         <h1 className="text-4xl md:text-7xl font-black text-slate-900 mb-4 md:mb-8 tracking-tighter px-4">
-          Survey Ekosistem <br />
+          Indeks Ekosistem <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-800">
-            Literasi Indonesia
+            Literasi
           </span>
         </h1>
         <p className="text-slate-500 text-sm md:text-xl mb-8 md:mb-16 max-w-2xl mx-auto px-6 font-medium leading-relaxed">
-          Bantu kami memetakan indeks literasi untuk menciptakan ekosistem belajar yang lebih baik dan berkelanjutan.
+          Merupakan alat ukur yang dikembangkan oleh Sekolah Literasi Indonesia untuk mengukur budaya literasi di suatu ekosistem pendidikan meliputi ekosistem sekolah, keluarga, dan masyarakat.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 px-4">

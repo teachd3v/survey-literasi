@@ -15,14 +15,20 @@ export default function HomePortal() {
       <div className="relative z-10 w-full max-w-5xl text-center">
         {/* Header */}
         <div className="mb-12 md:mb-20">
+          
           <div className="inline-block px-4 py-1.5 rounded-full bg-white shadow-sm border border-slate-100 mb-6">
             <span className="text-slate-600 font-black text-[10px] tracking-widest uppercase">Portal Assessment</span>
           </div>
+          {/* Organizer Logos */}
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <img src="/logo.png" alt="Sekolah Literasi Indonesia" className="h-10 md:h-15 w-auto object-contain" />
+          </div>
+          
           <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tighter">
             Indeks <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-emerald-500">Literasi Indonesia</span>
           </h1>
           <p className="text-slate-500 text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
-            Pilih instrumen survey yang ingin Anda isi. Kontribusi Anda sangat berharga untuk pemetaan dan pengembangan ekosistem literasi.
+            Membantu memetakan kondisi literasi keluarga, sekolah, dan masyarakat, serta mengukur minat baca sebagai langkah awal membangun budaya literasi yang kuat.
           </p>
         </div>
 
@@ -58,7 +64,7 @@ export default function HomePortal() {
               <span className="text-4xl">📖</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4">
-              Perilaku <br/>Minat Baca
+              Minat <br/> Baca
             </h2>
             <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed mb-8 h-16">
               Mengukur kebiasaan, preferensi, dan frekuensi membaca berdasarkan kategori usia.

@@ -42,7 +42,7 @@ function buildClusters(data, instrumen, lingkup) {
     if (!info) return;
     const key = info.variabel;
     if (!groups[key]) groups[key] = [];
-    groups[key].push({ kode: item.indicator, indikator: info.indikator, value: item.value });
+    groups[key].push({ kode: item.indicator, indikator: info.indikator, deskripsi: info.deskripsi, value: item.value });
   });
 
   return [...orderMap.entries()]
@@ -71,7 +71,7 @@ const CustomRadarTooltip = ({ active, payload }) => {
   );
 };
 
-export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDataLoaded }) {
+export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDataLoaded, dateFrom, dateTo }) {
   const [data, setData] = useState([]);
   const [instrumen, setInstrumen] = useState(null);
   const [instrLoading, setInstrLoading] = useState(true);
@@ -95,13 +95,13 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
     setError(null);
     setData([]);
 
-    fetchNeonIndicators(surveyType, lingkup)
+    fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo })
       .then(d => { if (!cancelled) setData(d); })
       .catch(e => { if (!cancelled) setError(e.response?.data?.error || e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [lingkup, surveyType]);
+  }, [lingkup, surveyType, dateFrom, dateTo]);
 
   const clusters = useMemo(() => buildClusters(data, instrumen, lingkup), [data, instrumen, lingkup]);
 
@@ -202,7 +202,7 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
               <span className="text-[10px] font-black bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded shrink-0 mt-0.5">
                 {s.kode}
               </span>
-              <p className="text-slate-500 text-xs font-medium flex-1 leading-snug">{s.indikator}</p>
+              <p className="text-slate-500 text-xs font-medium flex-1 leading-snug">{s.deskripsi || s.indikator}</p>
               <span className={`text-xs font-black tabular-nums shrink-0 mt-0.5 ${
                 s.value >= 3.0 ? 'text-emerald-600' : s.value >= 2.0 ? 'text-amber-600' : 'text-red-500'
               }`}>

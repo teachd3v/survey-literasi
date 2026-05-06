@@ -1,6 +1,6 @@
 // src/components/dashboard/StatCard.jsx
 
-export default function StatCard({ title, value, icon, subtitle, color = 'sky' }) {
+export default function StatCard({ title, value, icon, subtitle, color = 'sky', compareValue, compareLabel, numericValue }) {
   const getIcon = () => {
     switch (icon) {
       case 'users':
@@ -38,6 +38,15 @@ export default function StatCard({ title, value, icon, subtitle, color = 'sky' }
     slate: 'bg-slate-50 text-slate-600',
   };
 
+  // Numeric delta (for Total Responden, Indeks Nasional)
+  const baseNum = numericValue !== undefined ? numericValue : (typeof value === 'number' ? value : null);
+  const cmpNum = typeof compareValue === 'number' ? compareValue : null;
+  const showNumericDelta = baseNum !== null && cmpNum !== null;
+  const delta = showNumericDelta ? baseNum - cmpNum : null;
+
+  // String comparison (for Kategori Dominan)
+  const showStringCompare = typeof compareValue === 'string' && compareValue !== null;
+
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xl shadow-slate-200/40 relative overflow-hidden group hover:border-sky-300 transition-all">
       <div className="relative z-10 flex flex-col gap-1">
@@ -49,6 +58,25 @@ export default function StatCard({ title, value, icon, subtitle, color = 'sky' }
           <h3 className="text-3xl font-black text-slate-900 tracking-tighter">{value}</h3>
           {subtitle && <span className="text-slate-400 font-bold text-xs">{subtitle}</span>}
         </div>
+
+        {/* Numeric delta */}
+        {showNumericDelta && delta !== null && (
+          <div className={`flex items-center gap-1 mt-1 text-[10px] font-black ${delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            <span>{delta >= 0 ? '▲' : '▼'}</span>
+            <span>{delta >= 0 ? '+' : ''}{typeof delta === 'number' && !Number.isInteger(delta) ? delta.toFixed(2) : delta}</span>
+            <span className="text-slate-400 font-bold">vs {compareLabel}</span>
+          </div>
+        )}
+
+        {/* String compare (e.g. dominant category) */}
+        {showStringCompare && !showNumericDelta && (
+          <div className="flex items-center gap-1 mt-1 text-[10px] font-black text-violet-600">
+            <span>↔</span>
+            <span className="text-slate-400 font-bold">
+              {compareLabel}: <span className="text-violet-600">{compareValue}</span>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
