@@ -29,11 +29,21 @@ function calculateWeightedScore(scores, lingkup, bobotMap) {
 /**
  * Get category from score
  */
-function getCategory(score) {
-  if (score >= 3.6) return 'Sangat Baik';
-  if (score >= 3.0) return 'Baik';
-  if (score >= 2.0) return 'Berkembang';
-  return 'Perlu Perhatian';
+function getCategory(score, surveyType = 'literasi') {
+  if (surveyType === 'minatbaca') {
+    if (score >= 4.2) return 'Sangat Tinggi';
+    if (score >= 3.4) return 'Tinggi';
+    if (score >= 2.6) return 'Sedang';
+    if (score >= 1.8) return 'Rendah';
+    return 'Sangat Rendah';
+  } else {
+    const s = score * 25;
+    if (s >= 86) return 'Membudaya';
+    if (s >= 71) return 'Berkembang';
+    if (s >= 56) return 'Mulai Berkembang';
+    if (s >= 40) return 'Mulai Tumbuh';
+    return 'Perlu Intervensi';
+  }
 }
 
 

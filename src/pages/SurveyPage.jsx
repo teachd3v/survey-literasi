@@ -133,19 +133,34 @@ export default function SurveyPage({ type = 'literasi' }) {
       // Hitung skor terskala otomatis
       let totalWeightedScore = 0;
       questions.forEach(q => {
-        const val = answers[q.kode] || 0;
+        const val = answers[q.kode] !== undefined ? answers[q.kode] : 0;
+        // Minat baca menggunakan skala 1-5 (db value 0-4 + 1), sedangkan Literasi menggunakan skala 0-4
+        const adjustedVal = type === 'minatbaca' ? (val + 1) : val;
         const currentBobot = parseFloat(q.bobot) || 1;
         const proporsionalBobot = totalBobot > 0 ? (currentBobot / totalBobot) : 0;
         
-        // Asumsi nilai max per soal adalah 4. Jika bobot dinormalkan (sum = 1), max total = 4.0
-        totalWeightedScore += (val * proporsionalBobot);
+        totalWeightedScore += (adjustedVal * proporsionalBobot);
       });
 
-      // Kalkulasi kategori (Logika sederhana)
-      let category = 'Perlu Perhatian';
-      if (totalWeightedScore >= 3.6) category = 'Sangat Baik';
-      else if (totalWeightedScore >= 3.0) category = 'Baik';
-      else if (totalWeightedScore >= 2.0) category = 'Berkembang';
+      // Kalkulasi kategori (Logika 5 Kategori sesuai audit baru)
+      let category = '';
+      let calculatedPercent = 0;
+
+      if (type === 'minatbaca') {
+        calculatedPercent = totalWeightedScore * 20; // Skala 5.00 * 20 = 100
+        if (totalWeightedScore >= 4.2) category = 'Sangat Tinggi';
+        else if (totalWeightedScore >= 3.4) category = 'Tinggi';
+        else if (totalWeightedScore >= 2.6) category = 'Sedang';
+        else if (totalWeightedScore >= 1.8) category = 'Rendah';
+        else category = 'Sangat Rendah';
+      } else {
+        calculatedPercent = totalWeightedScore * 25; // Skala 4.00 * 25 = 100
+        if (calculatedPercent >= 86) category = 'Membudaya';
+        else if (calculatedPercent >= 71) category = 'Berkembang';
+        else if (calculatedPercent >= 56) category = 'Mulai Berkembang';
+        else if (calculatedPercent >= 40) category = 'Mulai Tumbuh';
+        else category = 'Perlu Intervensi';
+      }
 
       const payload = {
         surveyType: type,
@@ -153,7 +168,7 @@ export default function SurveyPage({ type = 'literasi' }) {
         identity,
         answers,
         result: {
-          score: (totalWeightedScore * 25).toFixed(2), // Skala 100
+          score: calculatedPercent.toFixed(2),
           weightedAvg: totalWeightedScore.toFixed(2),
           category
         }

@@ -3,11 +3,21 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tool
 import { fetchNeonIndicators } from '../../services/neon';
 import { fetchInstrumen } from '../../services/googleSheets';
 
-const catInfo = (v) => {
-  if (v >= 3.6) return { label: 'Sangat Baik', cls: 'bg-emerald-100 text-emerald-700' };
-  if (v >= 3.0) return { label: 'Baik',         cls: 'bg-sky-100 text-sky-700' };
-  if (v >= 2.0) return { label: 'Berkembang',   cls: 'bg-amber-100 text-amber-700' };
-  return             { label: 'Perlu Perhatian', cls: 'bg-red-100 text-red-600' };
+const catInfo = (v, surveyType) => {
+  if (surveyType === 'minatbaca') {
+    if (v >= 4.2) return { label: 'Sangat Tinggi', cls: 'bg-emerald-100 text-emerald-700' };
+    if (v >= 3.4) return { label: 'Tinggi',        cls: 'bg-sky-100 text-sky-700' };
+    if (v >= 2.6) return { label: 'Sedang',        cls: 'bg-blue-100 text-blue-700' };
+    if (v >= 1.8) return { label: 'Rendah',        cls: 'bg-amber-100 text-amber-700' };
+    return               { label: 'Sangat Rendah', cls: 'bg-red-100 text-red-600' };
+  } else {
+    const s = v * 25;
+    if (s >= 86) return { label: 'Membudaya',        cls: 'bg-emerald-100 text-emerald-700' };
+    if (s >= 71) return { label: 'Berkembang',       cls: 'bg-sky-100 text-sky-700' };
+    if (s >= 56) return { label: 'Mulai Berkembang', cls: 'bg-blue-100 text-blue-700' };
+    if (s >= 40) return { label: 'Mulai Tumbuh',     cls: 'bg-amber-100 text-amber-700' };
+    return              { label: 'Perlu Intervensi', cls: 'bg-red-100 text-red-600' };
+  }
 };
 
 // Keep first 3 words for radar axis label
@@ -52,10 +62,11 @@ function buildClusters(data, instrumen, lingkup) {
 const CustomRadarTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0];
+  const sType = d.payload.surveyType || 'literasi';
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-lg px-3 py-2 text-xs">
       <p className="font-black text-slate-700">{d.payload.fullLabel}</p>
-      <p className="font-bold text-sky-600 mt-0.5">Rata-rata: {d.value?.toFixed(2)} / 4.00</p>
+      <p className="font-bold text-sky-600 mt-0.5">Rata-rata: {d.value?.toFixed(2)} / {sType === 'minatbaca' ? '5.00' : '4.00'}</p>
     </div>
   );
 };
@@ -134,12 +145,13 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
     label:     shortLabel(c.variabel),
     fullLabel: c.variabel,
     value:     parseFloat(c.avg.toFixed(2)),
-    fullMark:  4,
+    fullMark:  surveyType === 'minatbaca' ? 5 : 4,
+    surveyType: surveyType,
   }));
 
   const ClusterItem = ({ c, index }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const cat = catInfo(c.avg);
+    const cat = catInfo(c.avg, surveyType);
     
     return (
       <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden transition-all duration-300">
@@ -167,7 +179,7 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
           <div className="flex items-center gap-4 shrink-0">
             <div className="text-right">
               <div className="text-xl font-black text-slate-900">{c.avg.toFixed(2)}</div>
-              <div className="text-[10px] text-slate-400 font-bold">/ 4.00</div>
+              <div className="text-[10px] text-slate-400 font-bold">/ {surveyType === 'minatbaca' ? '5.00' : '4.00'}</div>
             </div>
             {/* Chevron Icon */}
             <div className={`w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>

@@ -8,18 +8,38 @@ const GROUPS = [
   { id: 'desa_rt',   label: 'Desa & RT/RW' },
 ];
 
-const scoreColor = (score) => {
-  if (score >= 3.0) return 'bg-emerald-500';
-  if (score >= 2.0) return 'bg-sky-500';
-  if (score >= 1.0) return 'bg-amber-500';
-  return 'bg-red-400';
+const scoreColor = (score, surveyType) => {
+  if (surveyType === 'minatbaca') {
+    if (score >= 4.2) return 'bg-emerald-500';
+    if (score >= 3.4) return 'bg-sky-500';
+    if (score >= 2.6) return 'bg-blue-500';
+    if (score >= 1.8) return 'bg-amber-500';
+    return 'bg-red-400';
+  } else {
+    const s = score * 25;
+    if (s >= 86) return 'bg-emerald-500';
+    if (s >= 71) return 'bg-sky-500';
+    if (s >= 56) return 'bg-blue-500';
+    if (s >= 40) return 'bg-amber-500';
+    return 'bg-red-400';
+  }
 };
 
-const scoreCategory = (score) => {
-  if (score >= 3.6) return { label: 'Sangat Baik', cls: 'bg-emerald-100 text-emerald-700' };
-  if (score >= 3.0) return { label: 'Baik',        cls: 'bg-sky-100 text-sky-700' };
-  if (score >= 2.0) return { label: 'Berkembang',  cls: 'bg-amber-100 text-amber-700' };
-  return                    { label: 'Perlu Perhatian', cls: 'bg-red-100 text-red-600' };
+const scoreCategory = (score, surveyType) => {
+  if (surveyType === 'minatbaca') {
+    if (score >= 4.2) return { label: 'Sangat Tinggi', cls: 'bg-emerald-100 text-emerald-700' };
+    if (score >= 3.4) return { label: 'Tinggi',        cls: 'bg-sky-100 text-sky-700' };
+    if (score >= 2.6) return { label: 'Sedang',        cls: 'bg-blue-100 text-blue-700' };
+    if (score >= 1.8) return { label: 'Rendah',        cls: 'bg-amber-100 text-amber-700' };
+    return                    { label: 'Sangat Rendah', cls: 'bg-red-100 text-red-600' };
+  } else {
+    const s = score * 25;
+    if (s >= 86) return { label: 'Membudaya',        cls: 'bg-emerald-100 text-emerald-700' };
+    if (s >= 71) return { label: 'Berkembang',       cls: 'bg-sky-100 text-sky-700' };
+    if (s >= 56) return { label: 'Mulai Berkembang', cls: 'bg-blue-100 text-blue-700' };
+    if (s >= 40) return { label: 'Mulai Tumbuh',     cls: 'bg-amber-100 text-amber-700' };
+    return              { label: 'Perlu Intervensi', cls: 'bg-red-100 text-red-600' };
+  }
 };
 
 export default function ComparisonChart({ surveyType }) {
@@ -42,7 +62,7 @@ export default function ComparisonChart({ surveyType }) {
     return () => { cancelled = true; };
   }, [surveyType, activeGroup]);
 
-  const maxScore = Math.max(...data.map(d => d.avg_score), 4);
+  const maxScore = Math.max(...data.map(d => d.avg_score), surveyType === 'minatbaca' ? 5 : 4);
 
   return (
     <div>
@@ -83,8 +103,9 @@ export default function ComparisonChart({ surveyType }) {
       {!loading && !error && data.length > 0 && (
         <div className="space-y-5">
           {data.map((item, idx) => {
-            const pct = (item.avg_score / 4) * 100;
-            const cat = scoreCategory(item.avg_score);
+            const divider = surveyType === 'minatbaca' ? 5 : 4;
+            const pct = (item.avg_score / divider) * 100;
+            const cat = scoreCategory(item.avg_score, surveyType);
             return (
               <div key={item.label} className="flex items-center gap-4">
                 {/* Rank */}
@@ -99,12 +120,12 @@ export default function ComparisonChart({ surveyType }) {
                     <div className="flex items-center gap-2 shrink-0">
                       <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${cat.cls}`}>{cat.label}</span>
                       <span className="font-black text-slate-900">{item.avg_score.toFixed(2)}</span>
-                      <span className="text-slate-400 text-xs">/ 4.00</span>
+                      <span className="text-slate-400 text-xs">/ {surveyType === 'minatbaca' ? '5.00' : '4.00'}</span>
                     </div>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${scoreColor(item.avg_score)}`}
+                      className={`h-full rounded-full transition-all duration-700 ${scoreColor(item.avg_score, surveyType)}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>

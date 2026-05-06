@@ -114,7 +114,7 @@ export default function DashboardPage() {
             title="Indeks Nasional" 
             value={stats?.avgScore?.toFixed(2) || '0.00'}
             icon="chart"
-            subtitle="Skala 4.00"
+            subtitle={surveyType === 'minatbaca' ? 'Skala 5.00' : 'Skala 4.00'}
             color="sky"
           />
           <StatCard 
@@ -157,9 +157,10 @@ export default function DashboardPage() {
                     <div key={cat} className="flex justify-between items-center">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${
-                          cat === 'Sangat Baik' ? 'bg-emerald-400' :
-                          cat === 'Baik' ? 'bg-sky-400' :
-                          cat === 'Berkembang' ? 'bg-amber-400' : 'bg-red-400'
+                          cat === 'Membudaya' || cat === 'Sangat Tinggi' ? 'bg-emerald-400' :
+                          cat === 'Berkembang' || cat === 'Tinggi' ? 'bg-sky-400' :
+                          cat === 'Mulai Berkembang' || cat === 'Sedang' ? 'bg-blue-400' :
+                          cat === 'Mulai Tumbuh' || cat === 'Rendah' ? 'bg-amber-400' : 'bg-red-400'
                         }`}></div>
                         <span className="text-slate-200 font-bold text-sm">{cat}</span>
                       </div>
@@ -174,11 +175,21 @@ export default function DashboardPage() {
             <div className="bg-sky-600 text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
               <div className="relative z-10">
                 <h4 className="text-xl font-black mb-1 uppercase tracking-widest">Target</h4>
-                <div className="text-5xl font-black mb-2">18.7%</div>
-                <div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden">
-                   <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: '18.7%' }}></div>
-                </div>
-                <p className="text-sky-100 font-bold text-[10px] uppercase tracking-widest">240 dari 1,280 Sampel</p>
+                {(() => {
+                  const target = 500;
+                  const actual = stats?.totalResponses || 0;
+                  const pct = (actual / target) * 100;
+                  const barWidth = Math.min(pct, 100);
+                  return (
+                    <>
+                      <div className="text-5xl font-black mb-2">{pct.toFixed(1)}%</div>
+                      <div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden">
+                         <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: `${barWidth}%` }}></div>
+                      </div>
+                      <p className="text-sky-100 font-bold text-[10px] uppercase tracking-widest">{actual.toLocaleString()} dari {target.toLocaleString()} Sampel</p>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
