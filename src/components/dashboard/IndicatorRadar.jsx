@@ -96,7 +96,13 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
     setData([]);
 
     fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo })
-      .then(d => { if (!cancelled) setData(d); })
+      .then(d => {
+        if (!cancelled) {
+          // Guard: API may return { data: [...] } or directly an array
+          const arr = Array.isArray(d) ? d : (Array.isArray(d?.data) ? d.data : []);
+          setData(arr);
+        }
+      })
       .catch(e => { if (!cancelled) setError(e.response?.data?.error || e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
 

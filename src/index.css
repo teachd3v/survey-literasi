@@ -20,6 +20,7 @@
   --animate-blob: blob 7s infinite;
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shake: shake 0.3s ease-in-out;
 
   @keyframes blob {
     0%, 100% { transform: translate(0, 0) scale(1) }
@@ -30,6 +31,11 @@
   @keyframes float {
     0%, 100% { transform: translateY(0px) }
     50% { transform: translateY(-20px) }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
   }
 }
 

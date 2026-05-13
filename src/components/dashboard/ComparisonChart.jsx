@@ -55,7 +55,13 @@ export default function ComparisonChart({ surveyType, dateFrom, dateTo }) {
     setData([]);
 
     fetchNeonComparison(surveyType, activeGroup, { dateFrom, dateTo })
-      .then(d => { if (!cancelled) setData(d); })
+      .then(d => {
+        if (!cancelled) {
+          // Guard: API may return { data: [...] } or directly an array
+          const arr = Array.isArray(d) ? d : (Array.isArray(d?.data) ? d.data : []);
+          setData(arr);
+        }
+      })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
@@ -94,13 +100,13 @@ export default function ComparisonChart({ surveyType, dateFrom, dateTo }) {
         </div>
       )}
 
-      {!loading && !error && data.length === 0 && (
+      {!loading && !error && Array.isArray(data) && data.length === 0 && (
         <div className="h-48 flex items-center justify-center">
           <p className="text-slate-400 font-bold text-sm">Belum ada data untuk perbandingan ini</p>
         </div>
       )}
 
-      {!loading && !error && data.length > 0 && (
+      {!loading && !error && Array.isArray(data) && data.length > 0 && (
         <div className="space-y-5">
           {data.map((item, idx) => {
             const divider = surveyType === 'minatbaca' ? 5 : 4;
