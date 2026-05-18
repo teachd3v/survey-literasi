@@ -233,7 +233,11 @@ export default function SurveyPage({ type = 'literasi' }) {
                   <div key={field} className="md:col-span-2 flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
                     <input type="checkbox" id={field} className="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                       checked={identity[field]} onChange={e => handleIdentityChange(field, e.target.checked)} />
-                    <label htmlFor={field} className="text-slate-700 font-bold text-sm">{FIELD_LABELS[field]}</label>
+                    <label htmlFor={field} className="text-slate-700 font-bold text-sm">
+                      {identity.tbm 
+                        ? `Saya Tidak Pernah Ke ${identity.tbm.toUpperCase().includes('TBM') ? '' : 'TBM '}${identity.tbm}` 
+                        : 'Saya Tidak Pernah Ke TBM'}
+                    </label>
                   </div>
                 );
 

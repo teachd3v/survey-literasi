@@ -16,12 +16,12 @@ export default function QuestionStep({
   onNext,
   onPrev
 }) {
-  const [selectedValue, setSelectedValue] = useState(value || null);
+  const [selectedValue, setSelectedValue] = useState(value ?? null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [hoveredValue, setHoveredValue] = useState(null);
 
   useEffect(() => {
-    setSelectedValue(value || null);
+    setSelectedValue(value ?? null);
   }, [value, question.kode]);
 
   const handleSelect = (val) => {
