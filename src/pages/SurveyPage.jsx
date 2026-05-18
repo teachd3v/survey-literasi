@@ -25,7 +25,7 @@ const FIELD_LABELS = {
   tbm: 'Nama TBM (Tempat Baca Masyarakat)',
   rt: 'RT',
   rw: 'RW',
-  no_tbm: 'Saya Tidak Pernah Ke TBM'
+  no_tbm: 'Saya Pernah Datang ke TBM'
 };
 
 export default function SurveyPage({ type = 'literasi' }) {
@@ -235,8 +235,8 @@ export default function SurveyPage({ type = 'literasi' }) {
                       checked={identity[field]} onChange={e => handleIdentityChange(field, e.target.checked)} />
                     <label htmlFor={field} className="text-slate-700 font-bold text-sm">
                       {identity.tbm 
-                        ? `Saya Tidak Pernah Ke ${identity.tbm.toUpperCase().includes('TBM') ? '' : 'TBM '}${identity.tbm}` 
-                        : 'Saya Tidak Pernah Ke TBM'}
+                        ? `Saya Pernah Datang ke ${identity.tbm.toUpperCase().includes('TBM') ? '' : 'TBM '}${identity.tbm}` 
+                        : 'Saya Pernah Datang ke TBM'}
                     </label>
                   </div>
                 );
