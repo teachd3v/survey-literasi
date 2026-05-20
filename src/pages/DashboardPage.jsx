@@ -127,13 +127,13 @@ export default function DashboardPage() {
 
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg mb-4">
               <div className={`w-2 h-2 rounded-full animate-pulse ${surveyType === 'minatbaca' ? 'bg-emerald-600' : 'bg-sky-600'}`}></div>
-              <span className="text-slate-600 font-black text-[10px] uppercase tracking-widest">Real-time Analytics</span>
+              <span className="text-slate-600 font-black text-[10px] uppercase tracking-widest">Pemantauan Data Terkini</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">
-              Dashboard {surveyType === 'minatbaca' ? 'Minat Baca' : 'Literasi'}
+              Dasbor {surveyType === 'minatbaca' ? 'Indeks Aktivitas Membaca' : 'Indeks Ekosistem Literasi'}
             </h1>
             <p className="text-slate-500 font-medium text-lg">
-              Visualisasi pemetaan {surveyType === 'minatbaca' ? 'minat baca masyarakat' : 'ekosistem literasi nasional'} 2026.
+              Visualisasi Pemetaan {surveyType === 'minatbaca' ? 'Aktivitas Membaca Masyarakat' : 'Ekosistem Literasi Indonesia'} 2026.
             </p>
           </div>
           <div className="flex flex-col items-end">
@@ -397,7 +397,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
             <div>
               <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Analisis Detail Indikator</h3>
-              <p className="text-slate-400 text-sm font-medium">Breakdown skor per butir indikator strategis</p>
+              <p className="text-slate-400 text-sm font-medium">Rincian skor per butir indikator strategis</p>
             </div>
             {/* Custom Tabs */}
             <div className="flex flex-wrap gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">

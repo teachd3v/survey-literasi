@@ -44,7 +44,7 @@ export default function HomePortal() {
               <span className="text-4xl">🌍</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4">
-              Ekosistem <br/>Literasi
+              Indeks <br/>Ekosistem <br/>Literasi
             </h2>
             <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed mb-8 h-16">
               Mengukur dukungan ekosistem (Sekolah, Keluarga, Masyarakat) terhadap pembudayaan literasi.
@@ -64,7 +64,7 @@ export default function HomePortal() {
               <span className="text-4xl">📖</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4">
-              Minat <br/> Baca
+              Indeks <br/>Minat <br/>Baca
             </h2>
             <p className="text-slate-500 text-sm md:text-base font-medium leading-relaxed mb-8 h-16">
               Mengukur kebiasaan, preferensi, dan frekuensi membaca berdasarkan kategori usia.

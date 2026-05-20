@@ -83,8 +83,8 @@ export default function LingkupComparison({ data, compareData, compareLabel }) {
             )}
 
             <div className="flex justify-between mt-2">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Baseline: 0.00</span>
-              <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">Growth: {percentage.toFixed(1)}%</span>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Data Awal: 0.00</span>
+              <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">Peningkatan: {percentage.toFixed(1)}%</span>
             </div>
           </div>
         );
