@@ -24,11 +24,11 @@ export default async function handler(req, res) {
       tbm: identity.tbm || '',
       rt: identity.rt || '',
       rw: identity.rw || '',
-      noTbm: identity.no_tbm === 'YA' || identity.no_tbm === true,
+      noTbm: identity.no_tbm || 'Tidak pernah',
     }).returning();
 
     // 2. Simpan Semua Jawaban ke tabel 'answers'
-    // Kita map object { "S1.1": 4, "D1.28": [1, 3] } jadi array of objects
+    // ... (rest of answerRows logic)
     const answerRows = [];
     Object.entries(surveyAnswers).forEach(([code, val]) => {
       if (Array.isArray(val)) {
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     await db.insert(results).values({
       respondentId: insertedRespondent.id,
       totalScore: result.score.toString(),
-      weightedAvg: (result.score / 100).toFixed(2), // Asumsi score dlm persen
+      weightedAvg: result.weightedAvg.toString(),
       category: result.category,
     });
 

@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', lingkup, dateFrom, dateTo } = req.query;
+    const { type = 'literasi', lingkup, dateFrom, dateTo, tbmVisit } = req.query;
 
     if (!lingkup) {
       return res.status(400).json({ error: 'lingkup is required' });
@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     ];
     if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
     if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
+    if (tbmVisit && tbmVisit !== 'Semua') conds.push(eq(respondents.noTbm, tbmVisit));
 
     const rows = await db.select({
       indicator: answers.questionCode,

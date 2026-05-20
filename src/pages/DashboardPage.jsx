@@ -37,16 +37,17 @@ export default function DashboardPage() {
 
   const [period, setPeriod] = useState({ month: '', year: '' });
   const [comparePeriod, setComparePeriod] = useState({ month: '', year: '', active: false });
+  const [tbmVisitFilter, setTbmVisitFilter] = useState('Semua');
 
-  const loadData = async (type, per, cmpPer) => {
+  const loadData = async (type, per, cmpPer, tbmVisit) => {
     setLoading(true);
     try {
       const { dateFrom, dateTo } = periodToDateRange(per.month, per.year);
-      const promises = [fetchNeonStats(type, { dateFrom, dateTo })];
+      const promises = [fetchNeonStats(type, { dateFrom, dateTo, tbmVisit })];
 
       if (cmpPer.active) {
         const { dateFrom: cFrom, dateTo: cTo } = periodToDateRange(cmpPer.month, cmpPer.year);
-        promises.push(cFrom ? fetchNeonStats(type, { dateFrom: cFrom, dateTo: cTo }) : Promise.resolve(null));
+        promises.push(cFrom ? fetchNeonStats(type, { dateFrom: cFrom, dateTo: cTo, tbmVisit }) : Promise.resolve(null));
       }
 
       const [statsData, compareData] = await Promise.all(promises);
@@ -60,12 +61,13 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    loadData(surveyType, period, comparePeriod);
-  }, [surveyType, period.month, period.year, comparePeriod.month, comparePeriod.year, comparePeriod.active]);
+    loadData(surveyType, period, comparePeriod, tbmVisitFilter);
+  }, [surveyType, period.month, period.year, comparePeriod.month, comparePeriod.year, comparePeriod.active, tbmVisitFilter]);
 
   const handleTypeChange = (type) => {
     setSurveyType(type);
     setActiveLingkup(type === 'minatbaca' ? 'SD KELAS 1-3' : 'SEKOLAH');
+    setTbmVisitFilter('Semua');
     setRadarClusters([]);
     setCategoricalData([]);
   };
@@ -247,6 +249,26 @@ export default function DashboardPage() {
                 </div>
               </>
             )}
+
+            {/* TBM Visit Filter (Only for Minat Baca) */}
+            {surveyType === 'minatbaca' && (
+              <>
+                <div className="hidden lg:block h-10 w-px bg-slate-100 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Kunjungan TBM</span>
+                  <select
+                    value={tbmVisitFilter}
+                    onChange={e => setTbmVisitFilter(e.target.value)}
+                    className="px-4 py-2.5 rounded-xl border border-emerald-200 font-bold text-sm text-emerald-700 bg-emerald-50 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all cursor-pointer"
+                  >
+                    <option value="Semua">Semua Data TBM</option>
+                    <option value="Tidak pernah">Tidak pernah</option>
+                    <option value="Pernah">Pernah</option>
+                    <option value="Sering">Sering</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Active filter badges */}
@@ -392,7 +414,12 @@ export default function DashboardPage() {
             <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Perbandingan Lokasi</h3>
             <p className="text-slate-400 text-sm font-medium">Bandingkan capaian antar kabupaten, sekolah, TBM, dan RT/RW</p>
           </div>
-          <ComparisonChart surveyType={surveyType} dateFrom={activeDateFrom} dateTo={activeDateTo} />
+          <ComparisonChart 
+            surveyType={surveyType} 
+            dateFrom={activeDateFrom} 
+            dateTo={activeDateTo} 
+            tbmVisit={tbmVisitFilter}
+          />
         </div>
 
         {/* Detail Indikator - Full Width Bottom Row */}
@@ -428,6 +455,7 @@ export default function DashboardPage() {
             surveyType={surveyType}
             dateFrom={activeDateFrom}
             dateTo={activeDateTo}
+            tbmVisit={tbmVisitFilter}
             onDataLoaded={setRadarClusters}
           />
 
@@ -447,6 +475,7 @@ export default function DashboardPage() {
               surveyType={surveyType}
               dateFrom={activeDateFrom}
               dateTo={activeDateTo}
+              tbmVisit={tbmVisitFilter}
               onDataLoaded={setCategoricalData}
             />
           </div>

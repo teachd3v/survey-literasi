@@ -27,3 +27,4 @@ dist-ssr
 reference_files/
 .vercel
 .env*.local
+.env

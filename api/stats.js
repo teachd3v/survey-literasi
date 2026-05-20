@@ -2,10 +2,11 @@ import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
 import { eq, avg, count, and, gte, lt } from 'drizzle-orm';
 
-function buildWhere(type, dateFrom, dateTo) {
+function buildWhere(type, dateFrom, dateTo, tbmVisit) {
   const conds = [eq(respondents.surveyType, type)];
   if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
   if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
+  if (tbmVisit && tbmVisit !== 'Semua') conds.push(eq(respondents.noTbm, tbmVisit));
   return and(...conds);
 }
 
@@ -16,8 +17,8 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', dateFrom, dateTo } = req.query;
-    const where = buildWhere(type, dateFrom, dateTo);
+    const { type = 'literasi', dateFrom, dateTo, tbmVisit } = req.query;
+    const where = buildWhere(type, dateFrom, dateTo, tbmVisit);
 
     const [totalRes, avgRes, catRes, lingkupRes] = await Promise.all([
       db.select({ count: count() })

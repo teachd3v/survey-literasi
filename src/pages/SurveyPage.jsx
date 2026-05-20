@@ -34,8 +34,8 @@ export default function SurveyPage({ type = 'literasi' }) {
   const lingkup = lingkupParam ? decodeURIComponent(lingkupParam).toUpperCase() : null;
 
   const [step, setStep] = useState('IDENTITY'); 
-  const [identity, setIdentity] = useState({ 
-    nama: '', kabupaten: '', sekolah: '', desa: '', tbm: '', rt: '', rw: '', no_tbm: false 
+  const [identity, setIdentity] = useState({
+    nama: '', kabupaten: '', sekolah: '', desa: '', tbm: '', rt: '', rw: '', no_tbm: 'Tidak pernah'
   });
   const [answers, setAnswers] = useState({});
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
@@ -236,14 +236,22 @@ export default function SurveyPage({ type = 'literasi' }) {
                 const baseInput = "w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:outline-none focus:border-sky-500 focus:bg-white transition-all uppercase";
 
                 if (field === 'no_tbm') return (
-                  <div key={field} className="md:col-span-2 flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border-2 border-slate-100">
-                    <input type="checkbox" id={field} className="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                      checked={identity[field]} onChange={e => handleIdentityChange(field, e.target.checked)} />
-                    <label htmlFor={field} className="text-slate-700 font-bold text-sm">
-                      {identity.tbm 
-                        ? `Saya Pernah Datang ke ${identity.tbm.toUpperCase().includes('TBM') ? '' : 'TBM '}${identity.tbm}` 
+                  <div key={field} className="md:col-span-2">
+                    <label className="block text-slate-500 font-black uppercase tracking-widest text-[10px] mb-2 ml-1">
+                      {identity.tbm
+                        ? `Saya Pernah Datang ke ${identity.tbm.toUpperCase().includes('TBM') ? '' : 'TBM '}${identity.tbm}`
                         : 'Saya Pernah Datang ke TBM'}
                     </label>
+                    <select 
+                      required 
+                      className={baseSelect} 
+                      value={identity[field]} 
+                      onChange={e => handleIdentityChange(field, e.target.value)}
+                    >
+                      <option value="Tidak pernah">Tidak pernah</option>
+                      <option value="Pernah">Pernah</option>
+                      <option value="Sering">Sering</option>
+                    </select>
                   </div>
                 );
 
@@ -304,9 +312,6 @@ export default function SurveyPage({ type = 'literasi' }) {
     );
   }
 
-  // ... (Tampilan QUESTIONS, REVIEW, SUCCESS tetap sama seperti sebelumnya)
-  // [Untuk menghemat ruang, bagian QUESTIONS & SUCCESS tidak saya tulis ulang semua karena logikanya identik]
-  
   if (step === 'QUESTIONS') {
     const questions = surveyQuestions[lingkup];
     const q = questions[currentQuestionIdx];

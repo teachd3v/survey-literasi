@@ -42,7 +42,7 @@ const scoreCategory = (score, surveyType) => {
   }
 };
 
-export default function ComparisonChart({ surveyType, dateFrom, dateTo }) {
+export default function ComparisonChart({ surveyType, dateFrom, dateTo, tbmVisit }) {
   const [activeGroup, setActiveGroup] = useState('kabupaten');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,7 @@ export default function ComparisonChart({ surveyType, dateFrom, dateTo }) {
     setError(null);
     setData([]);
 
-    fetchNeonComparison(surveyType, activeGroup, { dateFrom, dateTo })
+    fetchNeonComparison(surveyType, activeGroup, { dateFrom, dateTo, tbmVisit })
       .then(d => {
         if (!cancelled) {
           // Guard: API may return { data: [...] } or directly an array
@@ -66,7 +66,7 @@ export default function ComparisonChart({ surveyType, dateFrom, dateTo }) {
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [surveyType, activeGroup, dateFrom, dateTo]);
+  }, [surveyType, activeGroup, dateFrom, dateTo, tbmVisit]);
 
   const maxScore = surveyType === 'minatbaca' ? 5 : 4;
 

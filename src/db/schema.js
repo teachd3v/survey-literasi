@@ -12,7 +12,7 @@ export const respondents = pgTable('respondents', {
   tbm: text('tbm'),
   rt: text('rt'),
   rw: text('rw'),
-  noTbm: boolean('no_tbm').default(false),
+  noTbm: text('no_tbm').default('Tidak pernah'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

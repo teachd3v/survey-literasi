@@ -16,11 +16,12 @@ export async function submitToNeon(payload) {
   }
 }
 
-export async function fetchNeonStats(surveyType, { dateFrom, dateTo } = {}) {
+export async function fetchNeonStats(surveyType, { dateFrom, dateTo, tbmVisit } = {}) {
   try {
     const params = { type: surveyType };
     if (dateFrom) params.dateFrom = dateFrom;
     if (dateTo) params.dateTo = dateTo;
+    if (tbmVisit) params.tbmVisit = tbmVisit;
     const response = await axios.get('/api/stats', { params });
     return response.data;
   } catch (error) {
@@ -29,11 +30,12 @@ export async function fetchNeonStats(surveyType, { dateFrom, dateTo } = {}) {
   }
 }
 
-export async function fetchNeonComparison(surveyType, groupBy, { dateFrom, dateTo } = {}) {
+export async function fetchNeonComparison(surveyType, groupBy, { dateFrom, dateTo, tbmVisit } = {}) {
   try {
     const params = { type: surveyType, groupBy };
     if (dateFrom) params.dateFrom = dateFrom;
     if (dateTo) params.dateTo = dateTo;
+    if (tbmVisit) params.tbmVisit = tbmVisit;
     const response = await axios.get('/api/comparison', { params });
     return response.data;
   } catch (error) {
@@ -42,11 +44,12 @@ export async function fetchNeonComparison(surveyType, groupBy, { dateFrom, dateT
   }
 }
 
-export async function fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom, dateTo } = {}) {
+export async function fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom, dateTo, tbmVisit } = {}) {
   try {
     const params = { type: surveyType, lingkup };
     if (dateFrom) params.dateFrom = dateFrom;
     if (dateTo) params.dateTo = dateTo;
+    if (tbmVisit) params.tbmVisit = tbmVisit;
     const response = await axios.get('/api/categorical-stats', { params });
     return response.data;
   } catch (error) {
@@ -55,11 +58,12 @@ export async function fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom,
   }
 }
 
-export async function fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo } = {}) {
+export async function fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo, tbmVisit } = {}) {
   try {
     const params = { type: surveyType, lingkup };
     if (dateFrom) params.dateFrom = dateFrom;
     if (dateTo) params.dateTo = dateTo;
+    if (tbmVisit) params.tbmVisit = tbmVisit;
     const response = await axios.get('/api/indicators', { params });
     return response.data;
   } catch (error) {
