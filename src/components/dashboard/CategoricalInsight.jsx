@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { fetchNeonCategoricalStats } from '../../services/neon';
 import { fetchInstrumen } from '../../services/googleSheets';
 
-export default function CategoricalInsight({ lingkup, surveyType = 'literasi', dateFrom, dateTo }) {
+export default function CategoricalInsight({ lingkup, surveyType = 'literasi', dateFrom, dateTo, onDataLoaded }) {
   const [stats, setStats] = useState({});
   const [instrumen, setInstrumen] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +72,12 @@ export default function CategoricalInsight({ lingkup, surveyType = 'literasi', d
       };
     }).filter(q => q.data.length > 0);
   }, [stats, instrumen, lingkup]);
+
+  useEffect(() => {
+    if (onDataLoaded && categoricalData.length > 0) {
+      onDataLoaded(categoricalData);
+    }
+  }, [categoricalData, onDataLoaded]);
 
   if (loading) return (
     <div className="h-48 flex items-center justify-center text-slate-400 font-bold animate-pulse">

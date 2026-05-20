@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [activeLingkup, setActiveLingkup] = useState('SEKOLAH');
   const [loading, setLoading] = useState(true);
   const [radarClusters, setRadarClusters] = useState([]);
+  const [categoricalData, setCategoricalData] = useState([]);
 
   const [period, setPeriod] = useState({ month: '', year: '' });
   const [comparePeriod, setComparePeriod] = useState({ month: '', year: '', active: false });
@@ -66,6 +67,7 @@ export default function DashboardPage() {
     setSurveyType(type);
     setActiveLingkup(type === 'minatbaca' ? 'SD KELAS 1-3' : 'SEKOLAH');
     setRadarClusters([]);
+    setCategoricalData([]);
   };
 
   const isPeriodActive = period.month && period.year && String(period.year).length === 4;
@@ -445,10 +447,16 @@ export default function DashboardPage() {
               surveyType={surveyType}
               dateFrom={activeDateFrom}
               dateTo={activeDateTo}
+              onDataLoaded={setCategoricalData}
             />
           </div>
 
-          <QualitativeAdvice surveyType={surveyType} lingkup={activeLingkup} clusters={radarClusters} />
+          <QualitativeAdvice 
+            surveyType={surveyType} 
+            lingkup={activeLingkup} 
+            clusters={radarClusters} 
+            categoricalData={categoricalData}
+          />
         </div>
       </div>
     </div>
