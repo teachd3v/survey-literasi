@@ -28,12 +28,25 @@ export default async function handler(req, res) {
     }).returning();
 
     // 2. Simpan Semua Jawaban ke tabel 'answers'
-    // Kita map object { "S1.1": 4, "S1.2": 3 } jadi array of objects
-    const answerRows = Object.entries(surveyAnswers).map(([code, val]) => ({
-      respondentId: insertedRespondent.id,
-      questionCode: code,
-      value: parseInt(val),
-    }));
+    // Kita map object { "S1.1": 4, "D1.28": [1, 3] } jadi array of objects
+    const answerRows = [];
+    Object.entries(surveyAnswers).forEach(([code, val]) => {
+      if (Array.isArray(val)) {
+        val.forEach(v => {
+          answerRows.push({
+            respondentId: insertedRespondent.id,
+            questionCode: code,
+            value: parseInt(v),
+          });
+        });
+      } else {
+        answerRows.push({
+          respondentId: insertedRespondent.id,
+          questionCode: code,
+          value: parseInt(val),
+        });
+      }
+    });
 
     if (answerRows.length > 0) {
       await db.insert(answers).values(answerRows);

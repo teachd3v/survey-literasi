@@ -42,6 +42,19 @@ export async function fetchNeonComparison(surveyType, groupBy, { dateFrom, dateT
   }
 }
 
+export async function fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom, dateTo } = {}) {
+  try {
+    const params = { type: surveyType, lingkup };
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+    const response = await axios.get('/api/categorical-stats', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Service Error (Categorical Stats):', error);
+    throw error;
+  }
+}
+
 export async function fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo } = {}) {
   try {
     const params = { type: surveyType, lingkup };

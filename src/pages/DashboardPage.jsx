@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import StatCard from '../components/dashboard/StatCard';
 import LingkupComparison from '../components/dashboard/LingkupComparison';
 import IndicatorRadar from '../components/dashboard/IndicatorRadar';
+import CategoricalInsight from '../components/dashboard/CategoricalInsight';
 import ComparisonChart from '../components/dashboard/ComparisonChart';
 import QualitativeAdvice from '../components/dashboard/QualitativeAdvice';
 import { fetchNeonStats } from '../services/neon';
@@ -427,6 +428,26 @@ export default function DashboardPage() {
             dateTo={activeDateTo}
             onDataLoaded={setRadarClusters}
           />
+
+          {/* New Categorical Insights Section */}
+          <div className="mt-12 pt-12 border-t border-slate-100">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center">
+                <span className="text-xl">💡</span>
+              </div>
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Wawasan Preferensi & Hambatan</h3>
+                <p className="text-slate-400 text-sm font-medium">Analisis kualitatif berdasarkan pilihan responden di lingkup {activeLingkup}</p>
+              </div>
+            </div>
+            <CategoricalInsight 
+              lingkup={activeLingkup} 
+              surveyType={surveyType}
+              dateFrom={activeDateFrom}
+              dateTo={activeDateTo}
+            />
+          </div>
+
           <QualitativeAdvice surveyType={surveyType} lingkup={activeLingkup} clusters={radarClusters} />
         </div>
       </div>

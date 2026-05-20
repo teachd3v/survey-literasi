@@ -264,37 +264,56 @@ export async function fetchInstrumen(sheetName = 'instrumen_literasi') {
     const rows = response.data.values;
     if (!rows || rows.length < 2) return null;
     
+    const headers = rows[0];
+    const getIndex = (name) => headers.findIndex(h => h.toLowerCase() === name.toLowerCase());
+
+    const idxLingkup = getIndex('Lingkup');
+    const idxKodeVar = getIndex('Kode_Variabel');
+    const idxVariabel = getIndex('Variabel');
+    const idxKodeInd = getIndex('Kode_Indikator');
+    const idxIndikator = getIndex('Indikator');
+    const idxDeskripsi = getIndex('Deskripsi');
+    const idxTipeSkala = getIndex('Tipe_Skala');
+    const idxBobot = getIndex('Bobot');
+
+    // Find all Scale columns
+    const skalaIndices = headers
+      .map((h, i) => h.toLowerCase().startsWith('skala_') ? i : -1)
+      .filter(i => i !== -1);
+
     const instrumen = {};
     
-    // Skip header row
-    // Headers expected: Lingkup, Kode_Variabel, Variabel, Kode_Indikator, Indikator, Deskripsi, Tipe_Skala, Skala_0, Skala_1, Skala_2, Skala_3, Skala_4, Bobot
+    // Process data rows
     rows.slice(1).forEach(row => {
-      const lingkup = row[0]?.toUpperCase();
+      const lingkup = row[idxLingkup]?.toUpperCase();
       if (!lingkup) return;
       
       if (!instrumen[lingkup]) {
         instrumen[lingkup] = [];
       }
       
-      const skala_detail = [
-        row[7] ? `0 = ${row[7]}` : '',
-        row[8] ? `1 = ${row[8]}` : '',
-        row[9] ? `2 = ${row[9]}` : '',
-        row[10] ? `3 = ${row[10]}` : '',
-        row[11] ? `4 = ${row[11]}` : ''
-      ].filter(s => s !== '').join('\n');
+      const skala_detail = skalaIndices
+        .map(i => {
+          const val = row[i];
+          if (val === undefined || val === '') return null;
+          // Extract number from header (e.g., "Skala_0" -> "0")
+          const num = headers[i].split('_')[1];
+          return `${num} = ${val}`;
+        })
+        .filter(s => s !== null)
+        .join('\n');
       
-      let bobot = row[12] ? row[12].toString().replace(',', '.') : '1';
+      let bobot = row[idxBobot] ? row[idxBobot].toString().replace(',', '.') : '1';
       bobot = parseFloat(bobot);
       if (isNaN(bobot)) bobot = 1;
       
       instrumen[lingkup].push({
-        kode_variabel: row[1] || '',
-        variabel: row[2] || '',
-        kode: row[3] || '',
-        indikator: row[4] || '',
-        deskripsi: row[5] || '',
-        tipe_skala: row[6] || '',
+        kode_variabel: row[idxKodeVar] || '',
+        variabel: row[idxVariabel] || '',
+        kode: row[idxKodeInd] || '',
+        indikator: row[idxIndikator] || '',
+        deskripsi: row[idxDeskripsi] || '',
+        tipe_skala: row[idxTipeSkala] || '',
         skala_detail: skala_detail,
         bobot: bobot
       });

@@ -127,16 +127,22 @@ export default function SurveyPage({ type = 'literasi' }) {
     try {
       const questions = surveyQuestions[lingkup];
       
-      // Hitung total bobot untuk auto-normalisasi
-      const totalBobot = questions.reduce((sum, q) => sum + (parseFloat(q.bobot) || 1), 0);
+      // Hitung total bobot (Hanya yang bobot > 0)
+      const totalBobot = questions.reduce((sum, q) => {
+        const b = parseFloat(q.bobot) || 0;
+        return sum + b;
+      }, 0);
       
       // Hitung skor terskala otomatis
       let totalWeightedScore = 0;
       questions.forEach(q => {
+        const currentBobot = parseFloat(q.bobot) || 0;
+        if (currentBobot <= 0) return; // Skip non-scoring questions
+
         const val = answers[q.kode] !== undefined ? answers[q.kode] : 0;
         // Minat baca menggunakan skala 1-5 (db value 0-4 + 1), sedangkan Literasi menggunakan skala 0-4
+        // Note: Multi-select tidak akan masuk ke sini karena bobotnya 0
         const adjustedVal = type === 'minatbaca' ? (val + 1) : val;
-        const currentBobot = parseFloat(q.bobot) || 1;
         const proporsionalBobot = totalBobot > 0 ? (currentBobot / totalBobot) : 0;
         
         totalWeightedScore += (adjustedVal * proporsionalBobot);
