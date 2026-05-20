@@ -11,10 +11,15 @@ export default async function handler(req, res) {
     const db = getDb();
     const { identity, answers: surveyAnswers, result, surveyType, lingkup } = req.body;
 
-    console.log('DEBUG: Menerima data survey untuk lingkup:', lingkup);
+    console.log('DEBUG: Payload diterima:', JSON.stringify({ surveyType, lingkup, identity }, null, 2));
+
+    if (!identity || !surveyAnswers || !result) {
+      return res.status(400).json({ success: false, error: 'Payload tidak lengkap' });
+    }
 
     // 1. Simpan Data Responden (Identity) ke tabel 'respondents'
-    const [insertedRespondent] = await db.insert(respondents).values({
+    console.log('DEBUG: Menyimpan responden...');
+    const result_insert = await db.insert(respondents).values({
       surveyType,
       lingkup,
       nama: identity.nama || identity.responden_nama || '',
@@ -27,23 +32,33 @@ export default async function handler(req, res) {
       noTbm: identity.no_tbm || 'Tidak pernah',
     }).returning();
 
+    if (!result_insert || result_insert.length === 0) {
+      throw new Error('Gagal menyimpan responden: Database tidak mengembalikan data');
+    }
+    const insertedRespondent = result_insert[0];
+    console.log('DEBUG: Responden disimpan, ID:', insertedRespondent.id);
+
     // 2. Simpan Semua Jawaban ke tabel 'answers'
-    // ... (rest of answerRows logic)
+    console.log('DEBUG: Menyimpan jawaban...');
     const answerRows = [];
     Object.entries(surveyAnswers).forEach(([code, val]) => {
+      const parsedVal = parseInt(val);
       if (Array.isArray(val)) {
         val.forEach(v => {
-          answerRows.push({
-            respondentId: insertedRespondent.id,
-            questionCode: code,
-            value: parseInt(v),
-          });
+          const pv = parseInt(v);
+          if (!isNaN(pv)) {
+            answerRows.push({
+              respondentId: insertedRespondent.id,
+              questionCode: code,
+              value: pv,
+            });
+          }
         });
-      } else {
+      } else if (!isNaN(parsedVal)) {
         answerRows.push({
           respondentId: insertedRespondent.id,
           questionCode: code,
-          value: parseInt(val),
+          value: parsedVal,
         });
       }
     });
@@ -51,8 +66,10 @@ export default async function handler(req, res) {
     if (answerRows.length > 0) {
       await db.insert(answers).values(answerRows);
     }
+    console.log(`DEBUG: ${answerRows.length} jawaban disimpan.`);
 
     // 3. Simpan Hasil Skor Akhir ke tabel 'results'
+    console.log('DEBUG: Menyimpan hasil...');
     await db.insert(results).values({
       respondentId: insertedRespondent.id,
       totalScore: result.score.toString(),
@@ -60,7 +77,7 @@ export default async function handler(req, res) {
       category: result.category,
     });
 
-    console.log('DEBUG: Berhasil simpan ke Neon DB. ID:', insertedRespondent.id);
+    console.log('DEBUG: Berhasil simpan semua data.');
 
     return res.status(200).json({ 
       success: true, 
@@ -72,7 +89,8 @@ export default async function handler(req, res) {
     console.error('SERVER ERROR (Submit Neon):', error);
     return res.status(500).json({ 
       success: false, 
-      error: error.message 
+      error: error.message,
+      details: error.toString()
     });
   }
 }

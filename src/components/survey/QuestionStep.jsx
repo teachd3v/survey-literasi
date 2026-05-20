@@ -186,7 +186,7 @@ export default function QuestionStep({
                 /* Single Select / Dropdown */
                 <div className="w-full mb-6">
                   <select 
-                    value={selectedValue ?? ''} 
+                    value={Array.isArray(selectedValue) ? (selectedValue[0] ?? '') : (selectedValue ?? '')} 
                     onChange={(e) => handleSelect(parseInt(e.target.value))}
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:outline-none focus:border-sky-500 focus:bg-white transition-all cursor-pointer"
                   >

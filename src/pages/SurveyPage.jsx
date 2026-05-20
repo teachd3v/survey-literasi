@@ -13,7 +13,7 @@ const IDENTITY_CONFIG = {
   'SD KELAS 1-3': ['nama', 'kabupaten', 'desa', 'sekolah', 'no_tbm'],
   'SD KELAS 4-6': ['nama', 'kabupaten', 'desa', 'sekolah', 'no_tbm'],
   'SMP-SMA': ['nama', 'kabupaten', 'desa', 'sekolah', 'no_tbm'],
-  'DEWASA': ['nama', 'kabupaten', 'desa', 'rt', 'rw'],
+  'DEWASA': ['nama', 'kabupaten', 'desa', 'rt', 'rw', 'no_tbm'],
 };
 
 // Helper untuk label input
@@ -315,7 +315,16 @@ export default function SurveyPage({ type = 'literasi' }) {
   if (step === 'QUESTIONS') {
     const questions = surveyQuestions[lingkup];
     const q = questions[currentQuestionIdx];
-    return <QuestionStep question={q} currentStep={currentQuestionIdx + 1} totalSteps={questions.length} value={answers[q.kode]} onChange={handleAnswer} onNext={nextQuestion} onPrev={prevQuestion} />;
+    return <QuestionStep 
+      key={q.kode}
+      question={q} 
+      currentStep={currentQuestionIdx + 1} 
+      totalSteps={questions.length} 
+      value={answers[q.kode]} 
+      onChange={handleAnswer} 
+      onNext={nextQuestion} 
+      onPrev={prevQuestion} 
+    />;
   }
 
   if (step === 'REVIEW') {
