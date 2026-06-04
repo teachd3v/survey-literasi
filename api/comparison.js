@@ -2,7 +2,7 @@ import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
 import { eq, avg, count, and, ilike, sql } from 'drizzle-orm';
 
-const VALID_GROUP_BY = ['kabupaten', 'tbm', 'sekolah', 'desa_rt', 'desa_sekolah'];
+const VALID_GROUP_BY = ['kabupaten', 'tbm', 'sekolah', 'desa_rt', 'desa_sekolah', 'tbm_sekolah', 'tbm_desa'];
 
 function buildFuzzyWhere(column, value) {
   if (!value || value.trim() === '') return null;
@@ -10,7 +10,7 @@ function buildFuzzyWhere(column, value) {
   return ilike(column, fuzzy);
 }
 
-function buildWhere(type, extraCond, tbmVisit, lingkup, kabupaten, desa, sekolah) {
+function buildWhere(type, extraCond, tbmVisit, lingkup, kabupaten, desa, sekolah, tbm) {
   const conds = [ilike(respondents.surveyType, `%${type.trim()}%`)];
   if (extraCond) conds.push(extraCond);
   
@@ -33,6 +33,10 @@ function buildWhere(type, extraCond, tbmVisit, lingkup, kabupaten, desa, sekolah
   if (sekolah && sekolah.trim() !== '') {
     conds.push(buildFuzzyWhere(respondents.sekolah, sekolah));
   }
+
+  if (tbm && tbm.trim() !== '') {
+    conds.push(buildFuzzyWhere(respondents.tbm, tbm));
+  }
   
   return and(...conds.filter(Boolean));
 }
@@ -51,18 +55,19 @@ export default async function handler(req, res) {
       lingkup,
       kabupaten: fKabupaten,
       desa: fDesa,
-      sekolah: fSekolah
+      sekolah: fSekolah,
+      tbm: fTbm
     } = req.query;
 
     if (!VALID_GROUP_BY.includes(groupBy)) {
       return res.status(400).json({ error: 'Invalid groupBy parameter' });
     }
 
-    const where = buildWhere(type, null, tbmVisit || '', lingkup || 'all', fKabupaten || '', fDesa || '', fSekolah || '');
+    const where = buildWhere(type, null, tbmVisit || '', lingkup || 'all', fKabupaten || '', fDesa || '', fSekolah || '', fTbm || '');
 
-    if (groupBy === 'desa_sekolah') {
+    if (groupBy === 'tbm_sekolah') {
       const raw = await db.select({
-        desa: respondents.desa,
+        tbm: respondents.tbm,
         sekolah: respondents.sekolah,
         avg_score: avg(results.weightedAvg),
         count: count(),
@@ -70,13 +75,65 @@ export default async function handler(req, res) {
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
         .where(where)
-        .groupBy(respondents.desa, respondents.sekolah);
+        .groupBy(respondents.tbm, respondents.sekolah);
+
+      return res.status(200).json(
+        raw.map(r => ({
+          tbm: r.tbm || 'Tanpa TBM',
+          sekolah: r.sekolah || 'Responden Umum',
+          avg_score: parseFloat(r.avg_score) || 0,
+          count: Number(r.count),
+        })).filter(r => r.count > 0)
+      );
+    }
+
+    if (groupBy === 'tbm_desa') {
+      const raw = await db.select({
+        tbm: respondents.tbm,
+        desa: respondents.desa,
+        rt: respondents.rt,
+        rw: respondents.rw,
+        avg_score: avg(results.weightedAvg),
+        count: count(),
+      })
+        .from(results)
+        .innerJoin(respondents, eq(results.respondentId, respondents.id))
+        .where(where)
+        .groupBy(respondents.tbm, respondents.desa, respondents.rt, respondents.rw);
+
+      return res.status(200).json(
+        raw.map(r => ({
+          tbm: r.tbm || 'Tanpa TBM',
+          desa: r.desa || 'Tanpa Nama Desa',
+          rt: r.rt || '',
+          rw: r.rw || '',
+          avg_score: parseFloat(r.avg_score) || 0,
+          count: Number(r.count),
+        })).filter(r => r.count > 0)
+      );
+    }
+
+    if (groupBy === 'desa_sekolah') {
+      const raw = await db.select({
+        desa: respondents.desa,
+        sekolah: respondents.sekolah,
+        rt: respondents.rt,
+        rw: respondents.rw,
+        avg_score: avg(results.weightedAvg),
+        count: count(),
+      })
+        .from(results)
+        .innerJoin(respondents, eq(results.respondentId, respondents.id))
+        .where(where)
+        .groupBy(respondents.desa, respondents.sekolah, respondents.rt, respondents.rw);
 
       return res.status(200).json(
         raw
           .map(r => ({
             desa: r.desa || 'Tanpa Nama Desa',
-            sekolah: r.sekolah || 'Responden Umum',
+            sekolah: r.sekolah || '',
+            rt: r.rt || '',
+            rw: r.rw || '',
             avg_score: parseFloat(r.avg_score) || 0,
             count: Number(r.count),
           }))

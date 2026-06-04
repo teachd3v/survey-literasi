@@ -28,13 +28,14 @@ export default function DashboardPage() {
   const [filterKabupaten, setFilterKabupaten] = useState('');
   const [filterDesa, setFilterDesa] = useState('');
   const [filterSekolah, setFilterSekolah] = useState('');
+  const [filterTbm, setFilterTbm] = useState('');
   const [validationData, setValidationData] = useState({});
 
   useEffect(() => {
     fetchIdentityValidation().then(setValidationData).catch(console.error);
   }, []);
 
-  const loadData = async (type, tbmVisit, fLingkup, fKab, fDesa, fSek) => {
+  const loadData = async (type, tbmVisit, fLingkup, fKab, fDesa, fSek, fTbm) => {
     setLoading(true);
     setError(null);
     try {
@@ -43,7 +44,8 @@ export default function DashboardPage() {
         lingkup: fLingkup?.trim() || 'all', 
         kabupaten: fKab?.trim() || '', 
         desa: fDesa?.trim() || '', 
-        sekolah: fSek?.trim() || '' 
+        sekolah: fSek?.trim() || '',
+        tbm: fTbm?.trim() || ''
       };
       
       const promises = [fetchNeonStats(type, params)];
@@ -51,10 +53,8 @@ export default function DashboardPage() {
       if (fLingkup !== 'all') {
         let group = 'kabupaten';
         if (fKab) {
-          // Rule: If Sekolah ecosystem selected, group by 'sekolah'. 
-          // If Masyarakat/Keluarga, group by 'desa_sekolah' to enable hierarchy.
-          if (fLingkup === 'sekolah') group = 'sekolah';
-          else group = 'desa_sekolah';
+          if (type === 'minatbaca') group = fLingkup === 'DEWASA' ? 'tbm_desa' : 'tbm_sekolah';
+          else group = fLingkup === 'sekolah' ? 'sekolah' : 'desa_sekolah';
         }
         promises.push(fetchNeonComparison(type, group, params));
       } else {
@@ -75,13 +75,24 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah);
-  }, [surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah]);
+    loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm);
+  }, [surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm]);
 
-  // Sync activeLingkup for Radar Chart and Insights
+  // Unified Sync for Detail Tabs
   useEffect(() => {
-    if (surveyType === 'literasi' && filterLingkup !== 'all') {
-      setActiveLingkup(filterLingkup.toUpperCase());
+    if (surveyType === 'literasi') {
+      if (filterLingkup !== 'all') {
+        setActiveLingkup(filterLingkup.toUpperCase());
+      } else if (!['SEKOLAH', 'KELUARGA', 'MASYARAKAT'].includes(activeLingkup)) {
+        setActiveLingkup('SEKOLAH');
+      }
+    } else {
+      const mbScopes = ['SD KELAS 1-3', 'SD KELAS 4-6', 'SMP-SMA', 'DEWASA'];
+      if (filterLingkup !== 'all') {
+        setActiveLingkup(filterLingkup);
+      } else if (!mbScopes.includes(activeLingkup)) {
+        setActiveLingkup('SD KELAS 1-3');
+      }
     }
   }, [filterLingkup, surveyType]);
 
@@ -94,12 +105,21 @@ export default function DashboardPage() {
     setFilterKabupaten('');
     setFilterDesa('');
     setFilterSekolah('');
+    setFilterTbm('');
     setRadarClusters([]);
     setCategoricalData([]);
     setExpandedRows(new Set());
   };
 
   const kabupatenList = Object.keys(validationData).sort();
+  const tbmList = useMemo(() => {
+    if (!filterKabupaten) return [];
+    const kData = validationData[filterKabupaten] || {};
+    const tbms = new Set();
+    Object.values(kData).forEach(d => { if (d.tbm) tbms.add(d.tbm); });
+    return Array.from(tbms).sort();
+  }, [validationData, filterKabupaten]);
+
   const desaList = filterKabupaten ? Object.keys(validationData[filterKabupaten] || {}).sort() : [];
   const sekolahList = (() => {
     if (!filterKabupaten) return [];
@@ -113,7 +133,13 @@ export default function DashboardPage() {
     return e.length ? e.sort((a, b) => b[1] - a[1])[0][0] : '-';
   };
 
-  const getTarget = (lingkup, kabupaten) => {
+  const getTarget = (lingkup, kabupaten, type) => {
+    if (type === 'minatbaca') {
+      if (lingkup === 'all' && !kabupaten) return 1000;
+      if (lingkup !== 'all' && !kabupaten) return 250;
+      if (lingkup === 'all' && kabupaten) return 200;
+      return 50;
+    }
     if (lingkup === 'all' && !kabupaten) return 750;
     if (lingkup !== 'all' && !kabupaten) return 250;
     if (lingkup === 'all' && kabupaten) return 150;
@@ -129,12 +155,29 @@ export default function DashboardPage() {
     });
   };
 
-  // Logic to build hierarchical data for the table
   const groupedBreakdown = useMemo(() => {
     if (!locationBreakdown || locationBreakdown.length === 0) return [];
     
-    // CASE A: Masyarakat or Keluarga with a region selected -> Hierarchical Desa > Sekolah
-    if ((filterLingkup === 'masyarakat' || filterLingkup === 'keluarga') && filterKabupaten) {
+    // MINAT BACA: TBM > Detail
+    if (surveyType === 'minatbaca' && filterKabupaten) {
+       const groups = {};
+       locationBreakdown.forEach(item => {
+         const tName = item.tbm || 'Tanpa TBM';
+         if (!groups[tName]) groups[tName] = { label: tName, children: [], totalCount: 0, sumScore: 0 };
+         groups[tName].children.push(item);
+         groups[tName].totalCount += item.count;
+         groups[tName].sumScore += (item.avg_score * item.count);
+       });
+       return Object.values(groups).map(g => ({
+         label: g.label,
+         avg_score: g.totalCount > 0 ? (g.sumScore / g.totalCount) : 0,
+         count: g.totalCount,
+         children: g.children
+       })).sort((a, b) => b.avg_score - a.avg_score);
+    }
+
+    // LITERASI: Desa > Detail
+    if (surveyType === 'literasi' && (filterLingkup === 'masyarakat' || filterLingkup === 'keluarga') && filterKabupaten) {
       const groups = {};
       locationBreakdown.forEach(item => {
         const dName = item.desa || 'Tanpa Nama Desa';
@@ -151,13 +194,12 @@ export default function DashboardPage() {
       })).sort((a, b) => b.avg_score - a.avg_score);
     }
     
-    // CASE B: Other cases (Kabupaten grouping or Sekolah grouping) -> Flat list
     return locationBreakdown.map(item => ({
-      label: item.label || item.sekolah || item.desa || 'Unknown',
+      label: item.label || item.sekolah || item.desa || item.tbm || 'Unknown',
       avg_score: item.avg_score,
       count: item.count
     }));
-  }, [locationBreakdown, filterLingkup, filterKabupaten]);
+  }, [locationBreakdown, filterLingkup, filterKabupaten, surveyType]);
 
   const getCategoryBadge = (score) => {
     const pct = score * 25;
@@ -173,7 +215,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <RefreshCw className="w-12 h-12 text-sky-600 animate-spin" />
-          <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Sinkronisasi Data...</p>
+          <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Menyinkronkan Dashboard...</p>
         </div>
       </div>
     );
@@ -182,37 +224,22 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3">
-        <button
-          onClick={() => loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah)}
-          className="flex items-center justify-center w-12 h-12 bg-white text-slate-600 rounded-2xl shadow-xl hover:bg-slate-50 transition-all duration-500"
-        >
-          <RefreshCw className="w-5 h-5" />
-        </button>
-        <Link to="/" className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-105 transition-all">
-          <ArrowLeft className="w-4 h-4" strokeWidth={3} /> Beranda
-        </Link>
+        <button onClick={() => loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm)} className="flex items-center justify-center w-12 h-12 bg-white text-slate-600 rounded-2xl shadow-xl hover:bg-slate-50 transition-all duration-500" title="Refresh Data"><RefreshCw className="w-5 h-5" /></button>
+        <Link to="/" className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-105 transition-all"><ArrowLeft className="w-4 h-4" strokeWidth={3} /> Beranda</Link>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pt-12">
         {stats?.totalResponses === 0 && !error && (
           <div className="mb-8 p-6 bg-amber-50 border-2 border-amber-200 rounded-[2rem] flex flex-col gap-4 shadow-xl">
              <div className="flex items-center justify-between text-amber-700 font-black uppercase tracking-widest text-xs">
-                <div className="flex items-center gap-3">
-                  <Search className="w-5 h-5" />
-                  <span>Diagnostic Panel: No Data Found</span>
-                </div>
+                <div className="flex items-center gap-3"><Search className="w-5 h-5" /><span>Diagnostic: No Data Found</span></div>
                 <div className="bg-amber-200 px-3 py-1 rounded-lg">Baseline: {stats?.debug?.baselineCount || 0}</div>
              </div>
-             <p className="text-amber-600 text-xs font-medium">Sistem tidak menemukan data untuk filter terpilih. Baseline (Data Tanpa Wilayah) menunjukkan {stats?.debug?.baselineCount} data tersedia.</p>
+             <p className="text-amber-600 text-xs font-medium">Sistem tidak menemukan data untuk filter terpilih. Baseline (Data Jenjang) menunjukkan {stats?.debug?.baselineCount} data tersedia.</p>
           </div>
         )}
 
-        {error && (
-          <div className="mb-8 p-4 bg-red-50 border-2 border-red-200 rounded-2xl flex items-center gap-3 text-red-600 font-bold text-sm">
-            <Info className="w-5 h-5" />
-            <span>Terjadi Kesalahan: {error}</span>
-          </div>
-        )}
+        {error && <div className="mb-8 p-4 bg-red-50 border-2 border-red-200 rounded-2xl flex items-center gap-3 text-red-600 font-bold text-sm"><Info className="w-5 h-5" /><span>Terjadi Kesalahan: {error}</span></div>}
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
@@ -220,50 +247,56 @@ export default function DashboardPage() {
               <button onClick={() => handleTypeChange('literasi')} className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 ${surveyType === 'literasi' ? 'bg-sky-600 border-sky-600 text-white shadow-lg' : 'bg-white border-slate-200 text-slate-400 hover:border-sky-200'}`}>Ekosistem Literasi</button>
               <button onClick={() => handleTypeChange('minatbaca')} className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 ${surveyType === 'minatbaca' ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg' : 'bg-white border-slate-200 text-slate-400 hover:border-emerald-200'}`}>Minat Baca</button>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">Dasbor {surveyType === 'minatbaca' ? 'Indeks Aktivitas Membaca' : 'Indeks Ekosistem Literasi'}</h1>
-            <p className="text-slate-500 font-medium text-lg">Visualisasi Pemetaan {surveyType === 'minatbaca' ? 'Aktivitas Membaca' : 'Ekosistem Literasi'} 2026.</p>
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">Dasbor {surveyType === 'minatbaca' ? 'Minat Baca' : 'Indeks Literasi'}</h1>
+            <p className="text-slate-500 font-medium text-lg">Visualisasi {surveyType === 'minatbaca' ? 'Aktivitas Membaca' : 'Ekosistem Literasi'} Indonesia 2026.</p>
           </div>
         </div>
 
         <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-lg shadow-slate-200/50 mb-8 space-y-6">
           <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center flex-wrap">
-            {surveyType === 'literasi' && (
-              <div className="flex flex-col">
-                <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Ekosistem</span>
-                <select value={filterLingkup} onChange={e => { setFilterLingkup(e.target.value); setFilterKabupaten(''); setFilterDesa(''); setFilterSekolah(''); }} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer">
-                  <option value="all">Semua Ekosistem</option>
-                  <option value="masyarakat">Masyarakat</option>
-                  <option value="keluarga">Keluarga</option>
-                  <option value="sekolah">Sekolah</option>
-                </select>
-              </div>
-            )}
+            <div className="flex flex-col">
+              <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">{surveyType === 'literasi' ? 'Ekosistem' : 'Lingkup Jenjang'}</span>
+              <select value={filterLingkup} onChange={e => { setFilterLingkup(e.target.value); setFilterKabupaten(''); setFilterDesa(''); setFilterSekolah(''); setFilterTbm(''); }} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer">
+                <option value="all">Semua {surveyType === 'literasi' ? 'Ekosistem' : 'Jenjang'}</option>
+                {surveyType === 'literasi' ? (
+                  <><option value="masyarakat">Masyarakat</option><option value="keluarga">Keluarga</option><option value="sekolah">Sekolah</option></>
+                ) : (
+                  <><option value="SD KELAS 1-3">SD KELAS 1-3</option><option value="SD KELAS 4-6">SD KELAS 4-6</option><option value="SMP-SMA">SMP-SMA</option><option value="DEWASA">DEWASA</option></>
+                )}
+              </select>
+            </div>
 
-            {surveyType === 'literasi' && filterLingkup !== 'all' && (
+            {filterLingkup !== 'all' && (
               <>
                 <div className="flex flex-col">
                   <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Wilayah</span>
-                  <select value={filterKabupaten} onChange={e => { setFilterKabupaten(e.target.value); setFilterDesa(''); setFilterSekolah(''); }} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer">
+                  <select value={filterKabupaten} onChange={e => { setFilterKabupaten(e.target.value); setFilterDesa(''); setFilterSekolah(''); setFilterTbm(''); }} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer">
                     <option value="">Semua Wilayah</option>
                     {kabupatenList.map(k => <option key={k} value={k}>{k}</option>)}
                   </select>
                 </div>
 
-                {filterLingkup === 'sekolah' ? (
+                {surveyType === 'minatbaca' && filterKabupaten && (
                   <div className="flex flex-col">
-                    <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Sekolah</span>
-                    <select value={filterSekolah} disabled={!filterKabupaten} onChange={e => setFilterSekolah(e.target.value)} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer disabled:opacity-40">
-                      <option value="">Semua Sekolah</option>
-                      {sekolahList.map(s => <option key={s} value={s}>{s}</option>)}
+                    <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Nama TBM</span>
+                    <select value={filterTbm} onChange={e => setFilterTbm(e.target.value)} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer">
+                      <option value="">Semua TBM</option>
+                      {tbmList.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
-                ) : (
+                )}
+
+                {!(filterLingkup === 'DEWASA' || filterLingkup === 'masyarakat' || filterLingkup === 'keluarga') && (
+                  <div className="flex flex-col">
+                    <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Sekolah</span>
+                    <select value={filterSekolah} disabled={!filterKabupaten} onChange={e => setFilterSekolah(e.target.value)} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer disabled:opacity-40"><option value="">Semua Sekolah</option>{sekolahList.map(s => <option key={s} value={s}>{s}</option>)}</select>
+                  </div>
+                )}
+
+                {(filterLingkup === 'DEWASA' || filterLingkup === 'masyarakat' || filterLingkup === 'keluarga') && (
                   <div className="flex flex-col">
                     <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Desa</span>
-                    <select value={filterDesa} disabled={!filterKabupaten} onChange={e => setFilterDesa(e.target.value)} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer disabled:opacity-40">
-                      <option value="">Semua Desa</option>
-                      {desaList.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
+                    <select value={filterDesa} disabled={!filterKabupaten} onChange={e => setFilterDesa(e.target.value)} className="px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-sky-300 transition-all cursor-pointer disabled:opacity-40"><option value="">Semua Desa</option>{desaList.map(d => <option key={d} value={d}>{d}</option>)}</select>
                   </div>
                 )}
               </>
@@ -272,12 +305,7 @@ export default function DashboardPage() {
             {surveyType === 'minatbaca' && (
               <div className="flex flex-col">
                 <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block mb-1 ml-1">Kunjungan TBM</span>
-                <select value={tbmVisitFilter} onChange={e => setTbmVisitFilter(e.target.value)} className="px-4 py-2.5 rounded-xl border border-emerald-200 font-bold text-sm text-emerald-700 bg-emerald-50 focus:outline-none focus:border-emerald-400 transition-all cursor-pointer">
-                  <option value="Semua">Semua Data TBM</option>
-                  <option value="Tidak pernah">Tidak pernah</option>
-                  <option value="Pernah">Pernah</option>
-                  <option value="Sering">Sering</option>
-                </select>
+                <select value={tbmVisitFilter} onChange={e => setTbmVisitFilter(e.target.value)} className="px-4 py-2.5 rounded-xl border border-emerald-200 font-bold text-sm text-emerald-700 bg-emerald-50 focus:outline-none focus:border-emerald-400 transition-all cursor-pointer"><option value="Semua">Semua Data TBM</option><option value="Tidak pernah">Tidak pernah</option><option value="Pernah">Pernah</option><option value="Sering">Sering</option></select>
               </div>
             )}
           </div>
@@ -293,12 +321,7 @@ export default function DashboardPage() {
           {filterLingkup === 'all' && (
             <div className="lg:col-span-2">
               <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50 h-full">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian per Lingkup</h3>
-                    <p className="text-slate-400 text-sm font-medium">Bandingkan performa antar ekosistem</p>
-                  </div>
-                </div>
+                <div className="mb-8"><h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian per {surveyType === 'minatbaca' ? 'Jenjang' : 'Ekosistem'}</h3></div>
                 <LingkupComparison data={stats?.lingkupStats || []} />
               </div>
             </div>
@@ -308,14 +331,14 @@ export default function DashboardPage() {
              <div className="lg:col-span-2">
                <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50 h-full">
                   <div className="mb-8">
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian Responden Ekosistem {filterLingkup.toUpperCase()}</h3>
+                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Capaian Responden {filterLingkup.toUpperCase()}</h3>
                     <p className="text-slate-400 text-sm font-medium">Distribusi partisipasi dan skor rata-rata</p>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-slate-100">
-                          <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-left">Lokasi / Wilayah</th>
+                          <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-left">Lokasi / Distribusi</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-center">Responden</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-center">Skor Avg</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right">Kategori</th>
@@ -330,52 +353,39 @@ export default function DashboardPage() {
 
                             return (
                               <React.Fragment key={i}>
-                                <tr 
-                                  className={`group transition-colors cursor-pointer ${hasChildren ? 'hover:bg-slate-50' : ''}`}
-                                  onClick={() => hasChildren && toggleRow(row.label)}
-                                >
+                                <tr className={`group transition-colors cursor-pointer ${hasChildren ? 'hover:bg-slate-50' : ''}`} onClick={() => hasChildren && toggleRow(row.label)}>
                                   <td className="py-4">
                                     <div className="flex items-center gap-3">
-                                      {hasChildren ? (
-                                        isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />
-                                      ) : (
-                                        <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600">
-                                           {filterLingkup === 'sekolah' ? <School className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                                        </div>
-                                      )}
+                                      {hasChildren ? (isExpanded ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />) : <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600">{filterLingkup === 'sekolah' || (surveyType === 'minatbaca' && filterLingkup !== 'DEWASA') ? <School className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}</div>}
                                       <span className="font-bold text-slate-700">{row.label}</span>
                                     </div>
                                   </td>
                                   <td className="py-4 text-center"><span className="font-black text-slate-900">{row.count}</span></td>
                                   <td className="py-4 text-center"><span className="font-black text-sky-600">{row.avg_score.toFixed(2)}</span></td>
-                                  <td className="py-4 text-right">
-                                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black text-white uppercase ${badge.color}`}>{badge.label}</span>
-                                  </td>
+                                  <td className="py-4 text-right"><span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black text-white uppercase ${badge.color}`}>{badge.label}</span></td>
                                 </tr>
                                 {isExpanded && row.children.map((child, idx) => {
                                   const childBadge = getCategoryBadge(child.avg_score);
+                                  let childLabel = '';
+                                  if (filterLingkup === 'keluarga' || (surveyType === 'minatbaca' && filterLingkup === 'DEWASA')) {
+                                    if (child.rt || child.rw) childLabel = `RT ${child.rt || '-'} / RW ${child.rw || '-'}`;
+                                    else childLabel = child.desa || 'Responden Umum';
+                                  } else {
+                                    childLabel = child.sekolah || 'Responden Umum';
+                                  }
                                   return (
                                     <tr key={`${i}-${idx}`} className="bg-slate-50/50 border-l-4 border-sky-500">
-                                      <td className="py-3 pl-12">
-                                        <div className="flex items-center gap-2">
-                                          <School className="w-3 h-3 text-slate-400" />
-                                          <span className="text-sm font-medium text-slate-600">{child.sekolah || 'Responden Umum'}</span>
-                                        </div>
-                                      </td>
+                                      <td className="py-3 pl-12"><div className="flex items-center gap-2">{filterLingkup === 'keluarga' || filterLingkup === 'DEWASA' ? <Home className="w-3 h-3 text-slate-400" /> : <School className="w-3 h-3 text-slate-400" />}<span className="text-sm font-medium text-slate-600">{childLabel}</span></div></td>
                                       <td className="py-3 text-center text-sm font-bold text-slate-500">{child.count}</td>
                                       <td className="py-3 text-center text-sm font-black text-sky-500">{child.avg_score.toFixed(2)}</td>
-                                      <td className="py-3 text-right">
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase ${childBadge.color}`}>{childBadge.label}</span>
-                                      </td>
+                                      <td className="py-3 text-right"><span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase ${childBadge.color}`}>{childBadge.label}</span></td>
                                     </tr>
                                   );
                                 })}
                               </React.Fragment>
                             );
                           })
-                        ) : (
-                          <tr><td colSpan="4" className="py-8 text-center text-slate-400 font-bold">Data tidak ditemukan</td></tr>
-                        )}
+                        ) : (<tr><td colSpan="4" className="py-8 text-center text-slate-400 font-bold">Data tidak ditemukan</td></tr>)}
                       </tbody>
                     </table>
                   </div>
@@ -405,17 +415,11 @@ export default function DashboardPage() {
               <div className="relative z-10">
                 <h4 className="text-xl font-black mb-1 uppercase tracking-widest">Target</h4>
                 {(() => {
-                  const target = getTarget(filterLingkup, filterKabupaten);
+                  const target = getTarget(filterLingkup, filterKabupaten, surveyType);
                   const actual = stats?.totalResponses || 0;
                   const pct = target > 0 ? (actual / target) * 100 : 0;
                   return (
-                    <>
-                      <div className="text-5xl font-black mb-2">{pct.toFixed(1)}%</div>
-                      <div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden">
-                         <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(pct, 100)}%` }}></div>
-                      </div>
-                      <p className="text-sky-100 font-bold text-[10px] uppercase tracking-widest">{actual.toLocaleString()} dari {target.toLocaleString()} Sampel</p>
-                    </>
+                    <><div className="text-5xl font-black mb-2">{pct.toFixed(1)}%</div><div className="w-full bg-sky-800/50 rounded-full h-3 mb-2 overflow-hidden"><div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(pct, 100)}%` }}></div></div><p className="text-sky-100 font-bold text-[10px] uppercase tracking-widest">{actual.toLocaleString()} dari {target.toLocaleString()} Sampel</p></>
                   );
                 })()}
               </div>
@@ -441,9 +445,9 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-          <IndicatorRadar key={activeLingkup} lingkup={activeLingkup} surveyType={surveyType} onDataLoaded={setRadarClusters} kabupaten={filterKabupaten} desa={filterDesa} sekolah={filterSekolah} tbmVisit={tbmVisitFilter} />
+          <IndicatorRadar key={`${activeLingkup}-${surveyType}`} lingkup={activeLingkup} surveyType={surveyType} onDataLoaded={setRadarClusters} kabupaten={filterKabupaten} desa={filterDesa} sekolah={filterSekolah} tbm={filterTbm} tbmVisit={tbmVisitFilter} />
           <div className="mt-12 pt-12 border-t border-slate-100">
-            <CategoricalInsight key={`${activeLingkup}-insight`} lingkup={activeLingkup} surveyType={surveyType} onDataLoaded={setCategoricalData} kabupaten={filterKabupaten} desa={filterDesa} sekolah={filterSekolah} tbmVisit={tbmVisitFilter} />
+            <CategoricalInsight key={`${activeLingkup}-${surveyType}-insight`} lingkup={activeLingkup} surveyType={surveyType} onDataLoaded={setCategoricalData} kabupaten={filterKabupaten} desa={filterDesa} sekolah={filterSekolah} tbm={filterTbm} tbmVisit={tbmVisitFilter} />
           </div>
           <QualitativeAdvice surveyType={surveyType} lingkup={activeLingkup} clusters={radarClusters} categoricalData={categoricalData} />
         </div>

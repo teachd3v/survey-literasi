@@ -1,19 +1,17 @@
 import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
-import { eq, avg, count, and, ilike, sql } from 'drizzle-orm';
+import { eq, avg, count, and, sql, ilike } from 'drizzle-orm';
 
 /**
- * Super robust fuzzy filter builder.
- * Replaces spaces/punctuation with % to be resilient against hidden chars.
+ * Super robust fuzzy filter builder using schema objects
  */
 function buildFuzzyWhere(column, value) {
   if (!value || value.trim() === '') return null;
-  // Replace anything not letters/numbers with %
   const fuzzy = '%' + value.trim().replace(/[^a-zA-Z0-9]/g, '%') + '%';
   return ilike(column, fuzzy);
 }
 
-function buildWhere(type, tbmVisit, lingkup, kabupaten, desa, sekolah) {
+function buildWhere(type, tbmVisit, lingkup, kabupaten, desa, sekolah, tbm) {
   const conds = [ilike(respondents.surveyType, `%${type.trim()}%`)];
   
   if (tbmVisit && tbmVisit !== 'Semua') {
@@ -35,6 +33,10 @@ function buildWhere(type, tbmVisit, lingkup, kabupaten, desa, sekolah) {
   if (sekolah && sekolah.trim() !== '') {
     conds.push(buildFuzzyWhere(respondents.sekolah, sekolah));
   }
+
+  if (tbm && tbm.trim() !== '') {
+    conds.push(buildFuzzyWhere(respondents.tbm, tbm));
+  }
   
   return and(...conds.filter(Boolean));
 }
@@ -52,10 +54,11 @@ export default async function handler(req, res) {
       lingkup,
       kabupaten,
       desa,
-      sekolah
+      sekolah,
+      tbm
     } = req.query;
     
-    const where = buildWhere(type, tbmVisit || '', lingkup || 'all', kabupaten || '', desa || '', sekolah || '');
+    const where = buildWhere(type, tbmVisit || '', lingkup || 'all', kabupaten || '', desa || '', sekolah || '', tbm || '');
 
     // Step 1: Baseline match (Survey Type + Lingkup ONLY)
     const baselineWhere = and(
@@ -80,7 +83,7 @@ export default async function handler(req, res) {
         debug: { 
           params: req.query, 
           baselineCount,
-          status: 'Filtered out by details'
+          status: 'Filtered out'
         }
       });
     }
