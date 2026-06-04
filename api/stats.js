@@ -1,13 +1,42 @@
 import { getDb } from './_db.js';
 import { respondents, results } from '../src/db/schema.js';
-import { eq, avg, count, and, gte, lt } from 'drizzle-orm';
+import { eq, avg, count, and, ilike, sql } from 'drizzle-orm';
 
-function buildWhere(type, dateFrom, dateTo, tbmVisit) {
-  const conds = [eq(respondents.surveyType, type)];
-  if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
-  if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
-  if (tbmVisit && tbmVisit !== 'Semua') conds.push(eq(respondents.noTbm, tbmVisit));
-  return and(...conds);
+/**
+ * Super robust fuzzy filter builder.
+ * Replaces spaces/punctuation with % to be resilient against hidden chars.
+ */
+function buildFuzzyWhere(column, value) {
+  if (!value || value.trim() === '') return null;
+  // Replace anything not letters/numbers with %
+  const fuzzy = '%' + value.trim().replace(/[^a-zA-Z0-9]/g, '%') + '%';
+  return ilike(column, fuzzy);
+}
+
+function buildWhere(type, tbmVisit, lingkup, kabupaten, desa, sekolah) {
+  const conds = [ilike(respondents.surveyType, `%${type.trim()}%`)];
+  
+  if (tbmVisit && tbmVisit !== 'Semua') {
+    conds.push(buildFuzzyWhere(respondents.noTbm, tbmVisit));
+  }
+  
+  if (lingkup && lingkup !== 'all') {
+    conds.push(buildFuzzyWhere(respondents.lingkup, lingkup));
+  }
+  
+  if (kabupaten && kabupaten.trim() !== '') {
+    conds.push(buildFuzzyWhere(respondents.kabupaten, kabupaten));
+  }
+  
+  if (desa && desa.trim() !== '') {
+    conds.push(buildFuzzyWhere(respondents.desa, desa));
+  }
+  
+  if (sekolah && sekolah.trim() !== '') {
+    conds.push(buildFuzzyWhere(respondents.sekolah, sekolah));
+  }
+  
+  return and(...conds.filter(Boolean));
 }
 
 export default async function handler(req, res) {
@@ -17,14 +46,46 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', dateFrom, dateTo, tbmVisit } = req.query;
-    const where = buildWhere(type, dateFrom, dateTo, tbmVisit);
+    const { 
+      type = 'literasi', 
+      tbmVisit,
+      lingkup,
+      kabupaten,
+      desa,
+      sekolah
+    } = req.query;
+    
+    const where = buildWhere(type, tbmVisit || '', lingkup || 'all', kabupaten || '', desa || '', sekolah || '');
 
-    const [totalRes, avgRes, catRes, lingkupRes] = await Promise.all([
-      db.select({ count: count() })
-        .from(respondents)
-        .where(where),
+    // Step 1: Baseline match (Survey Type + Lingkup ONLY)
+    const baselineWhere = and(
+      ilike(respondents.surveyType, `%${type.trim()}%`),
+      lingkup && lingkup !== 'all' ? ilike(respondents.lingkup, `%${lingkup.trim()}%`) : sql`1=1`
+    );
+    
+    const [totalRes, baselineRes] = await Promise.all([
+      db.select({ count: count() }).from(respondents).where(where),
+      db.select({ count: count() }).from(respondents).where(baselineWhere)
+    ]);
 
+    const totalResponses = Number(totalRes[0].count);
+    const baselineCount = Number(baselineRes[0].count);
+
+    if (totalResponses === 0) {
+      return res.status(200).json({
+        totalResponses: 0,
+        avgScore: 0,
+        categoryDistribution: {},
+        lingkupStats: [],
+        debug: { 
+          params: req.query, 
+          baselineCount,
+          status: 'Filtered out by details'
+        }
+      });
+    }
+
+    const [avgRes, catRes, lingkupRes] = await Promise.all([
       db.select({ avg: avg(results.weightedAvg) })
         .from(results)
         .innerJoin(respondents, eq(results.respondentId, respondents.id))
@@ -48,7 +109,7 @@ export default async function handler(req, res) {
     ]);
 
     return res.status(200).json({
-      totalResponses: Number(totalRes[0].count),
+      totalResponses,
       avgScore: parseFloat(avgRes[0].avg) || 0,
       categoryDistribution: catRes.reduce((acc, row) => {
         if (row.category) acc[row.category] = Number(row.count);

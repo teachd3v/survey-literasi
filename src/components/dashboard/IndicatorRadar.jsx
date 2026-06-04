@@ -71,7 +71,7 @@ const CustomRadarTooltip = ({ active, payload }) => {
   );
 };
 
-export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDataLoaded, dateFrom, dateTo, tbmVisit }) {
+export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDataLoaded, dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah }) {
   const [data, setData] = useState([]);
   const [instrumen, setInstrumen] = useState(null);
   const [instrLoading, setInstrLoading] = useState(true);
@@ -95,7 +95,7 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
     setError(null);
     setData([]);
 
-    fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo, tbmVisit })
+    fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah })
       .then(d => {
         if (!cancelled) {
           // Guard: API may return { data: [...] } or directly an array
@@ -107,7 +107,7 @@ export default function IndicatorRadar({ lingkup, surveyType = 'literasi', onDat
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [lingkup, surveyType, dateFrom, dateTo, tbmVisit]);
+  }, [lingkup, surveyType, dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah]);
 
   const clusters = useMemo(() => buildClusters(data, instrumen, lingkup), [data, instrumen, lingkup]);
 

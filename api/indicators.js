@@ -1,6 +1,6 @@
 import { getDb } from './_db.js';
 import { respondents, answers } from '../src/db/schema.js';
-import { eq, avg, and, gte, lt } from 'drizzle-orm';
+import { eq, avg, and, ilike, sql } from 'drizzle-orm';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -9,19 +9,36 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const { type = 'literasi', lingkup, dateFrom, dateTo, tbmVisit } = req.query;
+    const { 
+      type = 'literasi', 
+      lingkup, 
+      tbmVisit,
+      kabupaten,
+      desa,
+      sekolah
+    } = req.query;
 
     if (!lingkup) {
       return res.status(400).json({ error: 'lingkup is required' });
     }
 
     const conds = [
-      eq(respondents.surveyType, type),
-      eq(respondents.lingkup, lingkup.toUpperCase()),
+      ilike(respondents.surveyType, `%${type.trim()}%`),
+      ilike(respondents.lingkup, `%${lingkup.trim()}%`),
     ];
-    if (dateFrom) conds.push(gte(respondents.createdAt, new Date(dateFrom)));
-    if (dateTo) conds.push(lt(respondents.createdAt, new Date(dateTo)));
-    if (tbmVisit && tbmVisit !== 'Semua') conds.push(eq(respondents.noTbm, tbmVisit));
+    
+    if (tbmVisit && tbmVisit !== 'Semua') {
+      conds.push(ilike(respondents.noTbm, `%${tbmVisit.trim()}%`));
+    }
+    if (kabupaten && kabupaten.trim() !== '') {
+      conds.push(ilike(respondents.kabupaten, `%${kabupaten.trim().replace(/[^a-zA-Z0-9]/g, '%')}%`));
+    }
+    if (desa && desa.trim() !== '') {
+      conds.push(ilike(respondents.desa, `%${desa.trim().replace(/[^a-zA-Z0-9]/g, '%')}%`));
+    }
+    if (sekolah && sekolah.trim() !== '') {
+      conds.push(ilike(respondents.sekolah, `%${sekolah.trim().replace(/[^a-zA-Z0-9]/g, '%')}%`));
+    }
 
     const rows = await db.select({
       indicator: answers.questionCode,
@@ -30,8 +47,7 @@ export default async function handler(req, res) {
       .from(answers)
       .innerJoin(respondents, eq(answers.respondentId, respondents.id))
       .where(and(...conds))
-      .groupBy(answers.questionCode)
-      .orderBy(answers.questionCode);
+      .groupBy(answers.questionCode);
 
     return res.status(200).json(
       rows.map(row => ({

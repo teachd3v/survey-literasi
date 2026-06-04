@@ -2,20 +2,18 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '../src/db/schema.js';
 
-// Load environment variables for local serverless functions
-try {
-  const dotenv = await import('dotenv');
-  dotenv.config({ path: '.env.local' });
-  dotenv.config();
-} catch (e) {
-  // Ignore if dotenv is not available in production
-}
+// Singleton instance to prevent multiple connection overhead
+let dbInstance = null;
 
 export function getDb() {
+  if (dbInstance) return dbInstance;
+
   const url = process.env.DATABASE_URL;
   if (!url) {
-    throw new Error('No database connection string was provided. Please check process.env.DATABASE_URL');
+    throw new Error('DATABASE_URL is missing. Please check your .env file.');
   }
+
   const sql = neon(url);
-  return drizzle(sql, { schema });
+  dbInstance = drizzle(sql, { schema });
+  return dbInstance;
 }

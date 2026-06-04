@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { fetchNeonCategoricalStats } from '../../services/neon';
 import { fetchInstrumen } from '../../services/googleSheets';
 
-export default function CategoricalInsight({ lingkup, surveyType = 'literasi', dateFrom, dateTo, tbmVisit, onDataLoaded }) {
+export default function CategoricalInsight({ lingkup, surveyType = 'literasi', dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah, onDataLoaded }) {
   const [stats, setStats] = useState({});
   const [instrumen, setInstrumen] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export default function CategoricalInsight({ lingkup, surveyType = 'literasi', d
     const sheet = surveyType === 'minatbaca' ? 'instrumen_minatbaca' : 'instrumen_literasi';
     
     Promise.all([
-      fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom, dateTo, tbmVisit }),
+      fetchNeonCategoricalStats(surveyType, lingkup, { dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah }),
       fetchInstrumen(sheet)
     ])
       .then(([statsData, instrData]) => {
@@ -33,7 +33,7 @@ export default function CategoricalInsight({ lingkup, surveyType = 'literasi', d
       });
 
     return () => { cancelled = true; };
-  }, [lingkup, surveyType, dateFrom, dateTo, tbmVisit]);
+  }, [lingkup, surveyType, dateFrom, dateTo, tbmVisit, kabupaten, desa, sekolah]);
 
   const categoricalData = useMemo(() => {
     if (!instrumen || !instrumen[lingkup] || Object.keys(stats).length === 0) return [];
