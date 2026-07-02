@@ -89,3 +89,54 @@ export async function fetchNeonIndicators(surveyType, lingkup, { dateFrom, dateT
     throw error;
   }
 }
+
+export async function fetchNeonRespondents(surveyType, { dateFrom, dateTo, tbmVisit, lingkup, kabupaten, desa, sekolah, tbm } = {}) {
+  try {
+    const params = { type: surveyType };
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+    if (tbmVisit) params.tbmVisit = tbmVisit;
+    if (lingkup) params.lingkup = lingkup;
+    if (kabupaten) params.kabupaten = kabupaten;
+    if (desa) params.desa = desa;
+    if (sekolah) params.sekolah = sekolah;
+    if (tbm) params.tbm = tbm;
+    const response = await axios.get('/api/respondents', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Service Error (Respondents):', error);
+    throw error;
+  }
+}
+
+export async function deleteRespondent(id) {
+  try {
+    const response = await axios.delete('/api/delete-respondent', { params: { id } });
+    return response.data;
+  } catch (error) {
+    console.error('Service Error (Delete Respondent):', error);
+    throw error;
+  }
+}
+
+export async function fetchSurveySettings() {
+  try {
+    const response = await axios.get('/api/get-settings');
+    return response.data;
+  } catch (error) {
+    console.error('Service Error (Fetch Settings):', error);
+    throw error;
+  }
+}
+
+export async function updateSurveySetting(key, value) {
+  try {
+    const response = await axios.post('/api/set-settings', { key, value });
+    return response.data;
+  } catch (error) {
+    console.error('Service Error (Update Setting):', error);
+    throw error;
+  }
+}
+
+

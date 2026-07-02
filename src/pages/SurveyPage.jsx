@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import QuestionStep from '../components/survey/QuestionStep';
 import { fetchInstrumen, fetchIdentityValidation } from '../services/googleSheets';
-import { submitToNeon } from '../services/neon';
+import { submitToNeon, fetchSurveySettings } from '../services/neon';
 
 // Konfigurasi field identitas berdasarkan lingkup
 const IDENTITY_CONFIG = {
@@ -43,13 +43,31 @@ export default function SurveyPage({ type = 'literasi' }) {
   
   const [surveyQuestions, setSurveyQuestions] = useState(null);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+  const [isSurveyOpen, setIsSurveyOpen] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [validationData, setValidationData] = useState({});
 
   // Load validation data untuk dropdown identitas
   useEffect(() => {
     fetchIdentityValidation().then(setValidationData).catch(console.error);
-  }, []);
+    
+    async function checkStatus() {
+      try {
+        const settings = await fetchSurveySettings();
+        const isOpen = type === 'minatbaca'
+          ? settings.survey_minatbaca_open !== 'false'
+          : settings.survey_literasi_open !== 'false';
+        setIsSurveyOpen(isOpen);
+      } catch (err) {
+        console.error('Gagal memverifikasi status survey:', err);
+      } finally {
+        setIsLoadingStatus(false);
+      }
+    }
+    checkStatus();
+  }, [type]);
+
 
   // Derived options untuk cascading dropdown
   const kabupatenList = Object.keys(validationData).sort();
@@ -189,16 +207,36 @@ export default function SurveyPage({ type = 'literasi' }) {
     }
   };
 
-  if (isLoadingQuestions) {
+  if (isLoadingQuestions || isLoadingStatus) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-bold">Memuat Instrumen...</p>
+          <p className="text-slate-600 font-bold">Memuat Halaman...</p>
         </div>
       </div>
     );
   }
+
+  if (!isSurveyOpen) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="text-center max-w-md bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl">
+          <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Survey Ditutup Sementara</h2>
+          <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+            Form pengisian survey {type === 'minatbaca' ? 'Minat Baca' : 'Ekosistem Literasi'} saat ini sedang tidak menerima respon baru. Silakan hubungi administrator jika Anda merasa ini adalah kesalahan.
+          </p>
+          <button onClick={() => navigate('/')} className="w-full py-4 rounded-xl font-bold bg-slate-900 text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]">
+            Kembali ke Beranda
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   if (fetchError || !surveyQuestions) {
     return (

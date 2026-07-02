@@ -7,7 +7,7 @@ import IndicatorRadar from '../components/dashboard/IndicatorRadar';
 import CategoricalInsight from '../components/dashboard/CategoricalInsight';
 import ComparisonChart from '../components/dashboard/ComparisonChart';
 import QualitativeAdvice from '../components/dashboard/QualitativeAdvice';
-import { fetchNeonStats, fetchNeonComparison } from '../services/neon';
+import { fetchNeonStats, fetchNeonComparison, fetchNeonRespondents, deleteRespondent, fetchSurveySettings, updateSurveySetting } from '../services/neon';
 import { fetchIdentityValidation } from '../services/googleSheets';
 
 export default function DashboardPage() {
@@ -18,8 +18,13 @@ export default function DashboardPage() {
   const [radarClusters, setRadarClusters] = useState([]);
   const [categoricalData, setCategoricalData] = useState([]);
   const [locationBreakdown, setLocationBreakdown] = useState([]);
+  const [respondentsList, setRespondentsList] = useState([]);
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [error, setError] = useState(null);
+  const [surveySettings, setSurveySettings] = useState({
+    survey_literasi_open: 'true',
+    survey_minatbaca_open: 'true'
+  });
 
   const [tbmVisitFilter, setTbmVisitFilter] = useState('Semua');
 
@@ -33,6 +38,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchIdentityValidation().then(setValidationData).catch(console.error);
+    fetchSurveySettings().then(setSurveySettings).catch(console.error);
   }, []);
 
   const loadData = async (type, tbmVisit, fLingkup, fKab, fDesa, fSek, fTbm) => {
@@ -57,22 +63,48 @@ export default function DashboardPage() {
           else group = fLingkup === 'sekolah' ? 'sekolah' : 'desa_sekolah';
         }
         promises.push(fetchNeonComparison(type, group, params));
+
+        if (fKab) {
+          promises.push(fetchNeonRespondents(type, params));
+        } else {
+          promises.push(Promise.resolve([]));
+        }
       } else {
         promises.push(Promise.resolve([]));
+        promises.push(Promise.resolve([]));
       }
+
+      promises.push(fetchSurveySettings());
 
       const results = await Promise.all(promises);
       setStats(results[0]);
       setLocationBreakdown(Array.isArray(results[1]) ? results[1] : []);
+      setRespondentsList(Array.isArray(results[2]) ? results[2] : []);
+      if (results[3]) setSurveySettings(results[3]);
     } catch (err) {
       console.error('LoadData Error:', err);
       setError(err.response?.data?.error || err.message);
       setLocationBreakdown([]);
       setStats(null);
+      setRespondentsList([]);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleToggleSurvey = async (key, isOpen) => {
+    try {
+      const valStr = isOpen ? 'true' : 'false';
+      setSurveySettings(prev => ({ ...prev, [key]: valStr }));
+      await updateSurveySetting(key, valStr);
+    } catch (err) {
+      console.error(err);
+      alert('Gagal memperbarui status survey: ' + err.message);
+      fetchSurveySettings().then(setSurveySettings).catch(console.error);
+    }
+  };
+
+
 
   useEffect(() => {
     loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm);
@@ -154,6 +186,28 @@ export default function DashboardPage() {
       return next;
     });
   };
+
+  const handleDeleteRespondent = async (id, nama) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus responden "${nama}"?`)) {
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await deleteRespondent(id);
+      if (res.success) {
+        alert('Responden berhasil dihapus');
+        await loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm);
+      } else {
+        alert(res.error || 'Gagal menghapus responden');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || err.message || 'Terjadi kesalahan saat menghapus responden');
+      setLoading(false);
+    }
+  };
+
 
   const groupedBreakdown = useMemo(() => {
     if (!locationBreakdown || locationBreakdown.length === 0) return [];
@@ -250,7 +304,39 @@ export default function DashboardPage() {
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-2">Dasbor {surveyType === 'minatbaca' ? 'Minat Baca' : 'Indeks Literasi'}</h1>
             <p className="text-slate-500 font-medium text-lg">Visualisasi {surveyType === 'minatbaca' ? 'Aktivitas Membaca' : 'Ekosistem Literasi'} Indonesia 2026.</p>
           </div>
+
+          <div className="bg-white border border-slate-200 p-5 rounded-[1.5rem] shadow-sm flex flex-col gap-3 min-w-[240px]">
+            <span className="font-black text-[10px] uppercase tracking-widest text-slate-400 block border-b border-slate-100 pb-2">Status Form Survey</span>
+            <div className="space-y-3">
+              <label className="flex items-center justify-between cursor-pointer select-none">
+                <span className="text-xs font-bold text-slate-700">Ekosistem Literasi</span>
+                <div className="relative flex items-center">
+                  <input 
+                    type="checkbox" 
+                    checked={surveySettings.survey_literasi_open === 'true'} 
+                    onChange={(e) => handleToggleSurvey('survey_literasi_open', e.target.checked)}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
+                </div>
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer select-none">
+                <span className="text-xs font-bold text-slate-700">Minat Baca</span>
+                <div className="relative flex items-center">
+                  <input 
+                    type="checkbox" 
+                    checked={surveySettings.survey_minatbaca_open === 'true'} 
+                    onChange={(e) => handleToggleSurvey('survey_minatbaca_open', e.target.checked)}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
+
 
         <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-lg shadow-slate-200/50 mb-8 space-y-6">
           <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center flex-wrap">
@@ -342,6 +428,9 @@ export default function DashboardPage() {
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-center">Responden</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-center">Skor Avg</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right">Kategori</th>
+                          {filterLingkup !== 'all' && filterKabupaten !== '' && (
+                            <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right pr-4">Aksi</th>
+                          )}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
@@ -349,7 +438,25 @@ export default function DashboardPage() {
                           groupedBreakdown.map((row, i) => {
                             const badge = getCategoryBadge(row.avg_score);
                             const isExpanded = expandedRows.has(row.label);
-                            const hasChildren = row.children && row.children.length > 0;
+                            const showDeleteAction = filterLingkup !== 'all' && filterKabupaten !== '';
+                            const hasChildren = showDeleteAction ? true : (row.children && row.children.length > 0);
+
+                            const rowRespondents = showDeleteAction
+                              ? respondentsList.filter(resp => {
+                                  if (surveyType === 'minatbaca') {
+                                    const respTbm = resp.tbm || 'Tanpa TBM';
+                                    return respTbm === row.label;
+                                  } else {
+                                    if (filterLingkup === 'sekolah') {
+                                      const respSekolah = resp.sekolah || 'Tanpa Nama sekolah';
+                                      return respSekolah === row.label;
+                                    } else {
+                                      const respDesa = resp.desa || 'Tanpa Nama Desa';
+                                      return respDesa === row.label;
+                                    }
+                                  }
+                                })
+                              : [];
 
                             return (
                               <React.Fragment key={i}>
@@ -363,8 +470,9 @@ export default function DashboardPage() {
                                   <td className="py-4 text-center"><span className="font-black text-slate-900">{row.count}</span></td>
                                   <td className="py-4 text-center"><span className="font-black text-sky-600">{row.avg_score.toFixed(2)}</span></td>
                                   <td className="py-4 text-right"><span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black text-white uppercase ${badge.color}`}>{badge.label}</span></td>
+                                  {showDeleteAction && <td className="py-4 text-right">-</td>}
                                 </tr>
-                                {isExpanded && row.children.map((child, idx) => {
+                                {isExpanded && !showDeleteAction && row.children && row.children.map((child, idx) => {
                                   const childBadge = getCategoryBadge(child.avg_score);
                                   let childLabel = '';
                                   if (filterLingkup === 'keluarga' || (surveyType === 'minatbaca' && filterLingkup === 'DEWASA')) {
@@ -382,10 +490,44 @@ export default function DashboardPage() {
                                     </tr>
                                   );
                                 })}
+                                {isExpanded && showDeleteAction && rowRespondents.map((resp, idx) => {
+                                  const score = parseFloat(resp.weightedAvg || 0);
+                                  const respBadge = getCategoryBadge(score);
+                                  const details = [];
+                                  if (resp.desa) details.push(resp.desa);
+                                  if (resp.sekolah) details.push(resp.sekolah);
+                                  if (resp.rt || resp.rw) details.push(`RT ${resp.rt || '-'}/RW ${resp.rw || '-'}`);
+                                  const detailsStr = details.length > 0 ? ` (${details.join(', ')})` : '';
+
+                                  return (
+                                    <tr key={resp.id} className="bg-slate-50/50 border-l-4 border-rose-500">
+                                      <td className="py-3 pl-12">
+                                        <div className="flex items-center gap-2">
+                                          <Users className="w-3 h-3 text-slate-400" />
+                                          <span className="text-sm font-medium text-slate-600">{resp.nama || 'Responden Tanpa Nama'}<span className="text-[10px] text-slate-400">{detailsStr}</span></span>
+                                        </div>
+                                      </td>
+                                      <td className="py-3 text-center text-sm font-bold text-slate-500">-</td>
+                                      <td className="py-3 text-center text-sm font-black text-sky-500">{score.toFixed(2)}</td>
+                                      <td className="py-3 text-right"><span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase ${respBadge.color}`}>{respBadge.label}</span></td>
+                                      <td className="py-3 text-right pr-4">
+                                        <button 
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteRespondent(resp.id, resp.nama);
+                                          }} 
+                                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors"
+                                        >
+                                          Hapus
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
                               </React.Fragment>
                             );
                           })
-                        ) : (<tr><td colSpan="4" className="py-8 text-center text-slate-400 font-bold">Data tidak ditemukan</td></tr>)}
+                        ) : (<tr><td colSpan={filterLingkup !== 'all' && filterKabupaten !== '' ? 5 : 4} className="py-8 text-center text-slate-400 font-bold">Data tidak ditemukan</td></tr>)}
                       </tbody>
                     </table>
                   </div>

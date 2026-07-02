@@ -31,3 +31,10 @@ export const results = pgTable('results', {
   weightedAvg: numeric('weighted_avg', { precision: 10, scale: 2 }),
   category: text('category'),
 });
+
+// Tabel Settings/Konfigurasi
+export const settings = pgTable('settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+});
+
