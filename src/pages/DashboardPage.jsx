@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [filterSekolah, setFilterSekolah] = useState('');
   const [filterTbm, setFilterTbm] = useState('');
   const [validationData, setValidationData] = useState({});
+  const [selectedRespondents, setSelectedRespondents] = useState(new Set());
 
   useEffect(() => {
     fetchIdentityValidation().then(setValidationData).catch(console.error);
@@ -81,6 +82,7 @@ export default function DashboardPage() {
       setLocationBreakdown(Array.isArray(results[1]) ? results[1] : []);
       setRespondentsList(Array.isArray(results[2]) ? results[2] : []);
       if (results[3]) setSurveySettings(results[3]);
+      setSelectedRespondents(new Set());
     } catch (err) {
       console.error('LoadData Error:', err);
       setError(err.response?.data?.error || err.message);
@@ -141,6 +143,7 @@ export default function DashboardPage() {
     setRadarClusters([]);
     setCategoricalData([]);
     setExpandedRows(new Set());
+    setSelectedRespondents(new Set());
   };
 
   const kabupatenList = Object.keys(validationData).sort();
@@ -254,6 +257,76 @@ export default function DashboardPage() {
       count: item.count
     }));
   }, [locationBreakdown, filterLingkup, filterKabupaten, surveyType]);
+
+  const visibleRespondents = useMemo(() => {
+    const showDeleteAction = filterLingkup !== 'all' && filterKabupaten !== '';
+    if (!showDeleteAction) return [];
+    
+    let visible = [];
+    groupedBreakdown.forEach(row => {
+      const rowRespondents = respondentsList.filter(resp => {
+        if (surveyType === 'minatbaca') {
+          return (resp.tbm || 'Tanpa TBM') === row.label;
+        } else {
+          if (filterLingkup === 'sekolah') {
+            return (resp.sekolah || 'Tanpa Nama sekolah') === row.label;
+          } else {
+            return (resp.desa || 'Tanpa Nama Desa') === row.label;
+          }
+        }
+      });
+      visible = visible.concat(rowRespondents);
+    });
+    return visible;
+  }, [groupedBreakdown, respondentsList, filterLingkup, filterKabupaten, surveyType]);
+
+  const toggleRespondentSelection = (id) => {
+    setSelectedRespondents(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllRespondents = () => {
+    if (selectedRespondents.size === visibleRespondents.length && visibleRespondents.length > 0) {
+      setSelectedRespondents(new Set());
+    } else {
+      setSelectedRespondents(new Set(visibleRespondents.map(r => r.id)));
+    }
+  };
+
+  const handleDeleteSelectedRespondents = async () => {
+    if (selectedRespondents.size === 0) return;
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus ${selectedRespondents.size} responden terpilih?`)) {
+      return;
+    }
+    try {
+      setLoading(true);
+      const idsToDelete = Array.from(selectedRespondents);
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const id of idsToDelete) {
+        try {
+          const res = await deleteRespondent(id);
+          if (res.success) successCount++;
+          else failCount++;
+        } catch (e) {
+          failCount++;
+        }
+      }
+      
+      alert(`Berhasil menghapus ${successCount} responden.` + (failCount > 0 ? ` Gagal: ${failCount}` : ''));
+      setSelectedRespondents(new Set());
+      await loadData(surveyType, tbmVisitFilter, filterLingkup, filterKabupaten, filterDesa, filterSekolah, filterTbm);
+    } catch (err) {
+      console.error(err);
+      alert('Terjadi kesalahan saat menghapus responden secara massal');
+      setLoading(false);
+    }
+  };
 
   const getCategoryBadge = (score) => {
     const pct = score * 25;
@@ -429,7 +502,27 @@ export default function DashboardPage() {
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-center">Skor Avg</th>
                           <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right">Kategori</th>
                           {filterLingkup !== 'all' && filterKabupaten !== '' && (
-                            <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right pr-4">Aksi</th>
+                            <th className="pb-4 font-black text-[10px] uppercase tracking-widest text-slate-400 text-right pr-4">
+                              <div className="flex items-center justify-end gap-3">
+                                {selectedRespondents.size > 0 ? (
+                                  <button 
+                                    onClick={handleDeleteSelectedRespondents}
+                                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors shadow-sm"
+                                  >
+                                    Hapus ({selectedRespondents.size})
+                                  </button>
+                                ) : (
+                                  <span>AKSI</span>
+                                )}
+                                <input 
+                                  type="checkbox" 
+                                  onChange={toggleAllRespondents}
+                                  checked={visibleRespondents.length > 0 && selectedRespondents.size === visibleRespondents.length}
+                                  className="w-4 h-4 rounded border-slate-300 text-sky-500 focus:ring-sky-500 cursor-pointer"
+                                  title="Pilih Semua"
+                                />
+                              </div>
+                            </th>
                           )}
                         </tr>
                       </thead>
@@ -511,15 +604,27 @@ export default function DashboardPage() {
                                       <td className="py-3 text-center text-sm font-black text-sky-500">{score.toFixed(2)}</td>
                                       <td className="py-3 text-right"><span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black text-white uppercase ${respBadge.color}`}>{respBadge.label}</span></td>
                                       <td className="py-3 text-right pr-4">
-                                        <button 
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteRespondent(resp.id, resp.nama);
-                                          }} 
-                                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors"
-                                        >
-                                          Hapus
-                                        </button>
+                                        <div className="flex items-center justify-end gap-3">
+                                          <button 
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDeleteRespondent(resp.id, resp.nama);
+                                            }} 
+                                            className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors"
+                                          >
+                                            Hapus
+                                          </button>
+                                          <input
+                                            type="checkbox"
+                                            checked={selectedRespondents.has(resp.id)}
+                                            onChange={(e) => {
+                                              e.stopPropagation();
+                                              toggleRespondentSelection(resp.id);
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="w-4 h-4 rounded border-slate-300 text-sky-500 focus:ring-sky-500 cursor-pointer"
+                                          />
+                                        </div>
                                       </td>
                                     </tr>
                                   );
